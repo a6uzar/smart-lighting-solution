@@ -1,184 +1,278 @@
 "use client"
 
 import { useState } from "react"
-import { Clock, Zap, Moon, Sun } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Plus, Settings, Clock, Zap, Users, Lightbulb } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Navigation from "@/components/Navigation"
 
+interface AutomationRule {
+  id: string
+  name: string
+  enabled: boolean
+  trigger: {
+    type: "occupancy" | "time" | "manual"
+    condition: string
+  }
+  action: {
+    type: "lights" | "notification"
+    value: string
+  }
+  rooms: string[]
+  createdAt: string
+}
+
 export default function AutomationPage() {
-  const [autoTurnOff, setAutoTurnOff] = useState(true)
-  const [turnOffDelay, setTurnOffDelay] = useState([5])
-  const [nightMode, setNightMode] = useState(true)
-  const [nightModeTime, setNightModeTime] = useState("22:00")
-  const [dimLevel, setDimLevel] = useState([30])
-  const [motionSensitivity, setMotionSensitivity] = useState("medium")
+  const [rules, setRules] = useState<AutomationRule[]>([
+    {
+      id: "1",
+      name: "Auto Lights On - Person Detected",
+      enabled: true,
+      trigger: {
+        type: "occupancy",
+        condition: "Person detected with >75% confidence",
+      },
+      action: {
+        type: "lights",
+        value: "Turn ON lights",
+      },
+      rooms: ["All AI-enabled rooms"],
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "2",
+      name: "Auto Lights Off - Room Empty",
+      enabled: true,
+      trigger: {
+        type: "occupancy",
+        condition: "No person detected for 30 seconds",
+      },
+      action: {
+        type: "lights",
+        value: "Turn OFF lights",
+      },
+      rooms: ["All AI-enabled rooms"],
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "3",
+      name: "Night Mode - Low Light",
+      enabled: false,
+      trigger: {
+        type: "time",
+        condition: "Between 10:00 PM - 6:00 AM",
+      },
+      action: {
+        type: "lights",
+        value: "Dim to 30%",
+      },
+      rooms: ["Bedroom", "Hallway"],
+      createdAt: new Date().toISOString(),
+    },
+  ])
+
+  const toggleRule = (ruleId: string) => {
+    setRules((prev) => prev.map((rule) => (rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule)))
+  }
+
+  const activeRules = rules.filter((rule) => rule.enabled).length
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <Navigation />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900">Automation Rules</h2>
-          <p className="text-slate-600 mt-1">Configure smart lighting automation and AI detection settings</p>
-        </div>
-
-        <div className="space-y-6">
-          {/* Auto Turn Off */}
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <CardTitle>Auto Turn Off</CardTitle>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Automatically turn off lights when no occupancy is detected
-                    </p>
-                  </div>
-                </div>
-                <Switch checked={autoTurnOff} onCheckedChange={setAutoTurnOff} />
-              </div>
-            </CardHeader>
-            {autoTurnOff && (
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-slate-700">
-                      Turn off after: {turnOffDelay[0]} minutes
-                    </label>
-                    <Slider
-                      value={turnOffDelay}
-                      onValueChange={setTurnOffDelay}
-                      max={30}
-                      min={1}
-                      step={1}
-                      className="mt-2"
-                    />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
-                      <span>1 min</span>
-                      <span>30 min</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            )}
-          </Card>
-
-          {/* Night Mode */}
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Moon className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <CardTitle>Night Mode</CardTitle>
-                    <p className="text-sm text-slate-600 mt-1">Dim lights automatically during night hours</p>
-                  </div>
-                </div>
-                <Switch checked={nightMode} onCheckedChange={setNightMode} />
-              </div>
-            </CardHeader>
-            {nightMode && (
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-slate-700">Start Time</label>
-                    <input
-                      type="time"
-                      value={nightModeTime}
-                      onChange={(e) => setNightModeTime(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-700">Dim Level: {dimLevel[0]}%</label>
-                    <Slider value={dimLevel} onValueChange={setDimLevel} max={80} min={10} step={5} className="mt-2" />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
-                      <span>10%</span>
-                      <span>80%</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            )}
-          </Card>
-
-          {/* Motion Detection */}
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <CardTitle>Motion Detection Settings</CardTitle>
-                  <p className="text-sm text-slate-600 mt-1">Configure AI-based occupancy detection sensitivity</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Detection Sensitivity</label>
-                  <Select value={motionSensitivity} onValueChange={setMotionSensitivity}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low - Reduce false positives</SelectItem>
-                      <SelectItem value="medium">Medium - Balanced detection</SelectItem>
-                      <SelectItem value="high">High - Maximum sensitivity</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Energy Saving */}
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <Sun className="w-5 h-5 text-yellow-600" />
-                </div>
-                <div>
-                  <CardTitle>Energy Saving Mode</CardTitle>
-                  <p className="text-sm text-slate-600 mt-1">Optimize lighting for maximum energy efficiency</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="text-sm font-medium">Daylight Adjustment</span>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="text-sm font-medium">Gradual Dimming</span>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              Save Automation Settings
-            </Button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Automation Rules</h1>
+            <p className="text-slate-600">Configure smart lighting automation and AI behavior</p>
           </div>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Rule
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create Automation Rule</DialogTitle>
+              </DialogHeader>
+              <div className="p-4 text-center text-slate-600">
+                <Settings className="w-12 h-12 mx-auto mb-4 text-slate-400" />
+                <p>Rule creation interface coming soon...</p>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
-      </main>
+
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{rules.length}</div>
+              <div className="text-sm text-slate-600">Total Rules</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">{activeRules}</div>
+              <div className="text-sm text-slate-600">Active Rules</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
+              <div className="text-sm text-slate-600">AI Monitoring</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* AI Configuration */}
+        <Card className="mb-8 bg-white/60 backdrop-blur-sm border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Zap className="w-5 h-5" />
+              <span>AI Detection Settings</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="font-medium text-slate-900">Detection Parameters</h3>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-slate-900">Real-time Processing</div>
+                      <div className="text-sm text-slate-600">Continuous AI analysis of camera feeds</div>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-slate-900">Auto Light Control</div>
+                      <div className="text-sm text-slate-600">Automatically control lights based on occupancy</div>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-slate-900">Motion Sensitivity</div>
+                      <div className="text-sm text-slate-600">High sensitivity for person detection</div>
+                    </div>
+                    <Badge variant="outline">High</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-medium text-slate-900">Performance Metrics</h3>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-slate-900">Detection Accuracy</div>
+                      <div className="text-sm text-slate-600">Average confidence score</div>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">87%</Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-slate-900">Response Time</div>
+                      <div className="text-sm text-slate-600">Average detection to action time</div>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">1.2s</Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-slate-900">Uptime</div>
+                      <div className="text-sm text-slate-600">System availability</div>
+                    </div>
+                    <Badge className="bg-purple-100 text-purple-800">99.8%</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Automation Rules */}
+        <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Settings className="w-5 h-5" />
+              <span>Active Rules</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {rules.map((rule) => (
+                <div key={rule.id} className="border border-slate-200 rounded-lg p-4 bg-white/40">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <Switch checked={rule.enabled} onCheckedChange={() => toggleRule(rule.id)} />
+                      <div>
+                        <h3 className="font-medium text-slate-900">{rule.name}</h3>
+                        <p className="text-sm text-slate-600">
+                          Created {new Date(rule.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Badge variant={rule.enabled ? "default" : "secondary"}>
+                      {rule.enabled ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="flex items-center space-x-2">
+                      {rule.trigger.type === "occupancy" ? (
+                        <Users className="w-4 h-4 text-blue-600" />
+                      ) : rule.trigger.type === "time" ? (
+                        <Clock className="w-4 h-4 text-purple-600" />
+                      ) : (
+                        <Settings className="w-4 h-4 text-slate-600" />
+                      )}
+                      <div>
+                        <div className="font-medium text-slate-900">Trigger</div>
+                        <div className="text-slate-600">{rule.trigger.condition}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Lightbulb className="w-4 h-4 text-yellow-600" />
+                      <div>
+                        <div className="font-medium text-slate-900">Action</div>
+                        <div className="text-slate-600">{rule.action.value}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Settings className="w-4 h-4 text-slate-600" />
+                      <div>
+                        <div className="font-medium text-slate-900">Applies to</div>
+                        <div className="text-slate-600">{rule.rooms.join(", ")}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

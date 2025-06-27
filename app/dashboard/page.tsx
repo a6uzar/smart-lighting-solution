@@ -1,130 +1,209 @@
 "use client"
-
-import { useState, useEffect } from "react"
-import { Plus } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Home, Lightbulb, Users, Activity, Zap, Camera, TrendingUp } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import RoomCard from "@/components/RoomCard"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import Navigation from "@/components/Navigation"
+import RoomCard from "@/components/RoomCard"
 import { useRooms } from "@/hooks/useRooms"
+import { useLiveMonitoring } from "@/hooks/useLiveMonitoring"
 
-export default function Dashboard() {
-  const { rooms, loading } = useRooms()
-  const [stats, setStats] = useState({
-    totalRooms: 0,
-    occupiedRooms: 0,
-    lightsOn: 0,
-    energySaved: 0,
-  })
+export default function DashboardPage() {
+  const { rooms, isLoading } = useRooms()
+  const { isMonitoring, monitoringStats } = useLiveMonitoring()
 
-  useEffect(() => {
-    if (rooms.length > 0) {
-      const occupied = rooms.filter((room) => room.occupancyStatus === "occupied").length
-      const lightsOn = rooms.filter((room) => room.lightStatus === "on").length
+  const totalRooms = rooms.length
+  const occupiedRooms = rooms.filter((room) => room.occupancyStatus === "occupied").length
+  const lightsOn = rooms.filter((room) => room.lightStatus === "on").length
+  const aiControlledRooms = rooms.filter((room) => room.aiControlEnabled).length
 
-      setStats({
-        totalRooms: rooms.length,
-        occupiedRooms: occupied,
-        lightsOn,
-        energySaved: Math.round((rooms.length - lightsOn) * 2.5 * 100) / 100,
-      })
-    }
-  }, [rooms])
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
         <Navigation />
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse space-y-8">
+            <div className="h-8 bg-slate-200 rounded w-1/3"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-32 bg-slate-200 rounded-lg"></div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <Navigation />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Smart Lighting Dashboard</h1>
+          <p className="text-slate-600">AI-powered occupancy detection and automated lighting control</p>
+        </div>
+
+        {/* System Status */}
+        <Card className="mb-8 bg-white/60 backdrop-blur-sm border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Activity className="w-5 h-5" />
+              <span>System Status</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <div
+                    className={`w-3 h-3 rounded-full ${isMonitoring ? "bg-green-400 animate-pulse" : "bg-slate-300"}`}
+                  />
+                  <span className="font-medium text-slate-900">
+                    Live Monitoring: {isMonitoring ? "Active" : "Inactive"}
+                  </span>
+                </div>
+
+                <Badge variant={isMonitoring ? "default" : "secondary"} className={isMonitoring ? "bg-green-600" : ""}>
+                  {aiControlledRooms} AI Rooms Active
+                </Badge>
+              </div>
+
+              <div className="flex items-center space-x-4 text-sm text-slate-600">
+                <div className="flex items-center space-x-1">
+                  <Camera className="w-4 h-4" />
+                  <span>{monitoringStats.totalDetections} detections</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Zap className="w-4 h-4" />
+                  <span>{monitoringStats.lightSwitches} auto switches</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Total Rooms</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Rooms</CardTitle>
+              <Home className="h-4 w-4 text-slate-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{stats.totalRooms}</div>
+              <div className="text-2xl font-bold text-slate-900">{totalRooms}</div>
+              <p className="text-xs text-slate-600">{aiControlledRooms} with AI control</p>
             </CardContent>
           </Card>
 
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Occupied</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Occupied Rooms</CardTitle>
+              <Users className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.occupiedRooms}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Lights On</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.lightsOn}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Energy Saved</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.energySaved}kWh</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Room Grid */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Room Overview</h2>
-          <Link href="/rooms">
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Room
-            </Button>
-          </Link>
-        </div>
-
-        {rooms.length === 0 ? (
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-4">
-                <Plus className="w-8 h-8 text-slate-400" />
-              </div>
-              <h3 className="text-lg font-medium text-slate-900 mb-2">No rooms configured</h3>
-              <p className="text-slate-600 text-center mb-4 max-w-md">
-                Get started by adding your first room to begin smart lighting automation with AI-powered occupancy
-                detection.
+              <div className="text-2xl font-bold text-green-600">{occupiedRooms}</div>
+              <p className="text-xs text-slate-600">
+                {totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0}% occupancy rate
               </p>
-              <Link href="/rooms">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Your First Room
-                </Button>
-              </Link>
             </CardContent>
           </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {rooms.map((room) => (
-              <RoomCard key={room.id} room={room} />
-            ))}
+
+          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Lights Active</CardTitle>
+              <Lightbulb className="h-4 w-4 text-yellow-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">{lightsOn}</div>
+              <p className="text-xs text-slate-600">Auto-controlled lighting</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">AI Detections</CardTitle>
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{monitoringStats.totalDetections}</div>
+              <p className="text-xs text-slate-600">Total AI detections today</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="mb-8 bg-white/60 backdrop-blur-sm border-slate-200">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                asChild
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                <a href="/live-monitor">
+                  <Camera className="w-4 h-4 mr-2" />
+                  Live Monitor
+                </a>
+              </Button>
+
+              <Button asChild variant="outline">
+                <a href="/rooms">
+                  <Home className="w-4 h-4 mr-2" />
+                  Manage Rooms
+                </a>
+              </Button>
+
+              <Button asChild variant="outline">
+                <a href="/automation">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Automation Rules
+                </a>
+              </Button>
+
+              <Button asChild variant="outline">
+                <a href="/analytics">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  View Analytics
+                </a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Rooms */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-slate-900">Recent Activity</h2>
+            <Button asChild variant="outline" size="sm">
+              <a href="/rooms">View All Rooms</a>
+            </Button>
           </div>
-        )}
-      </main>
+
+          {rooms.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {rooms.slice(0, 6).map((room) => (
+                <RoomCard key={room.id} room={room} />
+              ))}
+            </div>
+          ) : (
+            <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+              <CardContent className="text-center py-12">
+                <Home className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-slate-900 mb-2">No Rooms Yet</h3>
+                <p className="text-slate-600 mb-4">Create your first room to start using AI-powered lighting control</p>
+                <Button asChild>
+                  <a href="/rooms">Add Your First Room</a>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

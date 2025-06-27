@@ -1,179 +1,237 @@
 "use client"
 
-import { TrendingUp, Clock, Zap, Users } from "lucide-react"
+import { useState } from "react"
+import { BarChart3, TrendingUp, Clock, Zap, Users } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import ChartPanel from "@/components/ChartPanel"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Navigation from "@/components/Navigation"
+import ChartPanel from "@/components/ChartPanel"
 
 export default function AnalyticsPage() {
-  const stats = {
+  const [timeRange, setTimeRange] = useState("7d")
+
+  // Mock analytics data
+  const analyticsData = {
     totalDetections: 1247,
-    avgOccupancyTime: "2.3h",
-    energySaved: "45.2kWh",
-    peakHours: "9-11 AM",
+    accuracyRate: 87.3,
+    energySaved: 23.5,
+    avgResponseTime: 1.2,
+    peakHours: "6:00 PM - 9:00 PM",
+    mostActiveRoom: "Living Room",
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <Navigation />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900">Analytics Dashboard</h2>
-          <p className="text-slate-600 mt-1">Monitor your smart lighting system performance and energy usage</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Analytics Dashboard</h1>
+            <p className="text-slate-600">Performance insights and usage statistics</p>
+          </div>
+
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="24h">Last 24 Hours</SelectItem>
+              <SelectItem value="7d">Last 7 Days</SelectItem>
+              <SelectItem value="30d">Last 30 Days</SelectItem>
+              <SelectItem value="90d">Last 90 Days</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Stats Cards */}
+        {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-slate-600">Total Detections</CardTitle>
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-4 h-4 text-blue-600" />
-                </div>
-              </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Detections</CardTitle>
+              <Users className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{stats.totalDetections}</div>
-              <p className="text-xs text-green-600 flex items-center mt-1">
-                <TrendingUp className="w-3 h-3 mr-1" />
-                +12% from last week
-              </p>
+              <div className="text-2xl font-bold text-blue-600">{analyticsData.totalDetections.toLocaleString()}</div>
+              <p className="text-xs text-slate-600">+12% from last period</p>
             </CardContent>
           </Card>
 
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-slate-600">Avg Occupancy</CardTitle>
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-green-600" />
-                </div>
-              </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Accuracy Rate</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{stats.avgOccupancyTime}</div>
-              <p className="text-xs text-green-600 flex items-center mt-1">
-                <TrendingUp className="w-3 h-3 mr-1" />
-                +5% from last week
-              </p>
+              <div className="text-2xl font-bold text-green-600">{analyticsData.accuracyRate}%</div>
+              <p className="text-xs text-slate-600">+2.1% improvement</p>
             </CardContent>
           </Card>
 
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-slate-600">Energy Saved</CardTitle>
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-purple-600" />
-                </div>
-              </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Energy Saved</CardTitle>
+              <Zap className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{stats.energySaved}</div>
-              <p className="text-xs text-green-600 flex items-center mt-1">
-                <TrendingUp className="w-3 h-3 mr-1" />
-                +8% from last week
-              </p>
+              <div className="text-2xl font-bold text-yellow-600">{analyticsData.energySaved}%</div>
+              <p className="text-xs text-slate-600">Compared to manual control</p>
             </CardContent>
           </Card>
 
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-slate-600">Peak Hours</CardTitle>
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-orange-600" />
-                </div>
-              </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Response Time</CardTitle>
+              <Clock className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{stats.peakHours}</div>
-              <p className="text-xs text-slate-600 mt-1">Most active period</p>
+              <div className="text-2xl font-bold text-purple-600">{analyticsData.avgResponseTime}s</div>
+              <p className="text-xs text-slate-600">Average detection to action</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartPanel
-            title="Occupancy Frequency"
-            type="line"
-            data={{
-              labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-              datasets: [
-                {
-                  label: "Detections",
-                  data: [65, 78, 90, 81, 56, 45, 38],
-                  borderColor: "rgb(59, 130, 246)",
-                  backgroundColor: "rgba(59, 130, 246, 0.1)",
-                  tension: 0.4,
-                },
-              ],
-            }}
-          />
+        {/* Charts and Detailed Analytics */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="occupancy">Occupancy</TabsTrigger>
+            <TabsTrigger value="energy">Energy</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+          </TabsList>
 
-          <ChartPanel
-            title="Light Usage by Room"
-            type="doughnut"
-            data={{
-              labels: ["Living Room", "Kitchen", "Bedroom", "Office", "Bathroom"],
-              datasets: [
-                {
-                  data: [30, 25, 20, 15, 10],
-                  backgroundColor: [
-                    "rgba(59, 130, 246, 0.8)",
-                    "rgba(16, 185, 129, 0.8)",
-                    "rgba(245, 158, 11, 0.8)",
-                    "rgba(139, 92, 246, 0.8)",
-                    "rgba(239, 68, 68, 0.8)",
-                  ],
-                },
-              ],
-            }}
-          />
-        </div>
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartPanel
+                title="Daily Activity"
+                description="Occupancy detections over time"
+                type="line"
+                timeRange={timeRange}
+              />
 
-        {/* Activity Log */}
-        <Card className="mt-6 bg-white/60 backdrop-blur-sm border-slate-200">
+              <ChartPanel title="Room Usage" description="Most active rooms" type="bar" timeRange={timeRange} />
+            </div>
+
+            <ChartPanel
+              title="Hourly Patterns"
+              description="Peak usage hours throughout the day"
+              type="area"
+              timeRange={timeRange}
+            />
+          </TabsContent>
+
+          <TabsContent value="occupancy" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartPanel
+                title="Occupancy Rate"
+                description="Percentage of time rooms are occupied"
+                type="donut"
+                timeRange={timeRange}
+              />
+
+              <ChartPanel
+                title="Detection Confidence"
+                description="AI confidence levels over time"
+                type="line"
+                timeRange={timeRange}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="energy" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartPanel
+                title="Energy Consumption"
+                description="Lighting energy usage patterns"
+                type="area"
+                timeRange={timeRange}
+              />
+
+              <ChartPanel
+                title="Savings Breakdown"
+                description="Energy saved by room"
+                type="bar"
+                timeRange={timeRange}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="performance" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartPanel
+                title="System Performance"
+                description="Response times and accuracy"
+                type="line"
+                timeRange={timeRange}
+              />
+
+              <ChartPanel
+                title="Error Rates"
+                description="False positives and negatives"
+                type="bar"
+                timeRange={timeRange}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Insights */}
+        <Card className="mt-8 bg-white/60 backdrop-blur-sm border-slate-200">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="w-5 h-5" />
+              <span>Key Insights</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { time: "2 minutes ago", action: "Motion detected in Living Room", status: "occupied" },
-                { time: "5 minutes ago", action: "Lights turned off in Kitchen", status: "empty" },
-                { time: "12 minutes ago", action: "Person detected in Office", status: "occupied" },
-                { time: "18 minutes ago", action: "Auto-dimming activated in Bedroom", status: "dimmed" },
-                { time: "25 minutes ago", action: "Motion detected in Bathroom", status: "occupied" },
-              ].map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-3 px-4 bg-slate-50 rounded-lg border-l-4 border-l-blue-500"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">{activity.action}</p>
-                    <p className="text-xs text-slate-600">{activity.time}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="font-medium text-slate-900">Usage Patterns</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm text-slate-600">Peak Hours</span>
+                    <span className="font-medium text-slate-900">{analyticsData.peakHours}</span>
                   </div>
-                  <span
-                    className={`px-3 py-1 text-xs font-medium rounded-full ${
-                      activity.status === "occupied"
-                        ? "bg-green-100 text-green-800"
-                        : activity.status === "empty"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {activity.status}
-                  </span>
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm text-slate-600">Most Active Room</span>
+                    <span className="font-medium text-slate-900">{analyticsData.mostActiveRoom}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm text-slate-600">Average Daily Detections</span>
+                    <span className="font-medium text-slate-900">178</span>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-medium text-slate-900">Recommendations</h3>
+                <div className="space-y-3">
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="font-medium text-blue-900 text-sm">Optimize Detection Interval</div>
+                    <div className="text-blue-700 text-xs mt-1">
+                      Consider reducing interval to 2s during peak hours for better responsiveness
+                    </div>
+                  </div>
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="font-medium text-green-900 text-sm">Energy Efficiency</div>
+                    <div className="text-green-700 text-xs mt-1">
+                      Current settings are saving 23.5% energy compared to manual control
+                    </div>
+                  </div>
+                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="font-medium text-purple-900 text-sm">System Performance</div>
+                    <div className="text-purple-700 text-xs mt-1">
+                      AI accuracy has improved by 2.1% this week - system is learning well
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   )
 }
