@@ -14,7 +14,13 @@ export function useRooms() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY)
         if (stored) {
-          setRooms(JSON.parse(stored))
+          const parsedRooms = JSON.parse(stored)
+          // Ensure all rooms have the liveMonitoringEnabled field
+          const updatedRooms = parsedRooms.map((room: any) => ({
+            ...room,
+            liveMonitoringEnabled: room.liveMonitoringEnabled ?? false,
+          }))
+          setRooms(updatedRooms)
         }
       } catch (error) {
         console.error("Failed to load rooms:", error)
@@ -57,11 +63,21 @@ export function useRooms() {
     saveRooms(filteredRooms)
   }
 
+  const getLiveMonitoringRooms = () => {
+    return rooms.filter((room) => room.liveMonitoringEnabled)
+  }
+
+  const getManualControlRooms = () => {
+    return rooms.filter((room) => !room.liveMonitoringEnabled)
+  }
+
   return {
     rooms,
     loading,
     addRoom,
     updateRoom,
     deleteRoom,
+    getLiveMonitoringRooms,
+    getManualControlRooms,
   }
 }

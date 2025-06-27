@@ -5,6 +5,7 @@ export interface Room {
   imageUrl?: string
   occupancyStatus: "occupied" | "empty"
   lightStatus: "on" | "off"
+  liveMonitoringEnabled: boolean
   createdAt: string
   updatedAt: string
 }
@@ -14,6 +15,14 @@ export interface DetectionResult {
   occupancy: boolean
   confidence: number
   error?: string
+  boundingBoxes?: Array<{
+    x: number
+    y: number
+    width: number
+    height: number
+    confidence: number
+  }>
+  processingTime?: number
 }
 
 export interface AutomationRule {
@@ -32,4 +41,11 @@ export interface AutomationRule {
     lightStatus?: "on" | "off"
     dimLevel?: number
   }
+}
+
+export interface LiveMonitoringSettings {
+  detectionInterval: number // seconds
+  confidenceThreshold: number // 0-1
+  autoLightControl: boolean
+  enableBoundingBoxes: boolean
 }
