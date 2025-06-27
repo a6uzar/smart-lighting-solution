@@ -28,6 +28,7 @@ export default function RoomForm({ room, onSubmit, onCancel }: RoomFormProps) {
     occupancyStatus: room?.occupancyStatus || ("empty" as const),
     lightStatus: room?.lightStatus || ("off" as const),
     liveMonitoringEnabled: room?.liveMonitoringEnabled || false,
+    aiControlEnabled: room?.aiControlEnabled || true,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,6 +110,25 @@ export default function RoomForm({ room, onSubmit, onCancel }: RoomFormProps) {
               id="liveMonitoring"
               checked={formData.liveMonitoringEnabled}
               onCheckedChange={(checked) => handleChange("liveMonitoringEnabled", checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="aiControl" className="text-base font-medium">
+                  AI Control Enabled
+                </Label>
+                <div
+                  className={`w-2 h-2 rounded-full ${formData.aiControlEnabled ? "bg-purple-400 animate-pulse" : "bg-gray-300"}`}
+                />
+              </div>
+              <p className="text-sm text-slate-600">Allow AI to automatically control room lighting</p>
+            </div>
+            <Switch
+              id="aiControl"
+              checked={formData.aiControlEnabled}
+              onCheckedChange={(checked) => handleChange("aiControlEnabled", checked)}
             />
           </div>
 

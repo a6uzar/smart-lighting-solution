@@ -15,6 +15,7 @@ const defaultRooms: Room[] = [
     occupancyStatus: "empty",
     lightStatus: "off",
     liveMonitoringEnabled: false,
+    aiControlEnabled: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -26,6 +27,7 @@ const defaultRooms: Room[] = [
     occupancyStatus: "empty",
     lightStatus: "off",
     liveMonitoringEnabled: true,
+    aiControlEnabled: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -104,6 +106,10 @@ export function useRooms() {
     return rooms.find((room) => room.id === id)
   }
 
+  const getLiveMonitoringRooms = () => {
+    return rooms.filter((room) => room.liveMonitoringEnabled)
+  }
+
   return {
     rooms,
     isLoading,
@@ -111,5 +117,6 @@ export function useRooms() {
     updateRoom,
     deleteRoom,
     getRoomById,
+    getLiveMonitoringRooms,
   }
 }

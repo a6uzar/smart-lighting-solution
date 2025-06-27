@@ -22,15 +22,15 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 transition-colors duration-500">
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Analytics Dashboard</h1>
-            <p className="text-slate-600">Performance insights and usage statistics</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Analytics Dashboard</h1>
+            <p className="text-slate-600 dark:text-slate-400">Performance insights and usage statistics</p>
           </div>
 
           <Select value={timeRange} onValueChange={setTimeRange}>

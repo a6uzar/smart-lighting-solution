@@ -48,6 +48,7 @@ export default function RoomCard({ room, onEdit }: RoomCardProps) {
       occupancyStatus: room.occupancyStatus,
       lightStatus: room.lightStatus,
       liveMonitoringEnabled: enabled,
+      aiControlEnabled: room.aiControlEnabled,
     })
   }
 

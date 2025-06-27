@@ -36,18 +36,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 transition-colors duration-500">
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Smart Lighting Dashboard</h1>
-          <p className="text-slate-600">AI-powered occupancy detection and automated lighting control</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Smart Lighting Dashboard</h1>
+          <p className="text-slate-600 dark:text-slate-400">AI-powered occupancy detection and automated lighting control</p>
         </div>
 
         {/* System Status */}
-        <Card className="mb-8 bg-white/60 backdrop-blur-sm border-slate-200">
+        <Card className="mb-8 glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Activity className="w-5 h-5" />
@@ -87,57 +87,57 @@ export default function DashboardPage() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Rooms</CardTitle>
-              <Home className="h-4 w-4 text-slate-600" />
+              <CardTitle className="text-sm font-medium dark-text-secondary">Total Rooms</CardTitle>
+              <Home className="h-4 w-4 text-slate-600 dark:text-slate-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{totalRooms}</div>
-              <p className="text-xs text-slate-600">{aiControlledRooms} with AI control</p>
+              <div className="text-2xl font-bold dark-text-primary">{totalRooms}</div>
+              <p className="text-xs dark-text-secondary">{aiControlledRooms} with AI control</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Occupied Rooms</CardTitle>
-              <Users className="h-4 w-4 text-green-600" />
+              <CardTitle className="text-sm font-medium dark-text-secondary">Occupied Rooms</CardTitle>
+              <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{occupiedRooms}</div>
-              <p className="text-xs text-slate-600">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{occupiedRooms}</div>
+              <p className="text-xs dark-text-secondary">
                 {totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0}% occupancy rate
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Lights Active</CardTitle>
-              <Lightbulb className="h-4 w-4 text-yellow-600" />
+              <CardTitle className="text-sm font-medium dark-text-secondary">Lights Active</CardTitle>
+              <Lightbulb className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{lightsOn}</div>
-              <p className="text-xs text-slate-600">Auto-controlled lighting</p>
+              <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{lightsOn}</div>
+              <p className="text-xs dark-text-secondary">Auto-controlled lighting</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">AI Detections</CardTitle>
-              <TrendingUp className="h-4 w-4 text-blue-600" />
+              <CardTitle className="text-sm font-medium dark-text-secondary">AI Detections</CardTitle>
+              <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{monitoringStats.totalDetections}</div>
-              <p className="text-xs text-slate-600">Total AI detections today</p>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{monitoringStats.totalDetections}</div>
+              <p className="text-xs dark-text-secondary">Total AI detections today</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Quick Actions */}
-        <Card className="mb-8 bg-white/60 backdrop-blur-sm border-slate-200">
+        <Card className="mb-8 glass-card">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="dark-text-primary">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
@@ -178,7 +178,7 @@ export default function DashboardPage() {
         {/* Recent Rooms */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-slate-900">Recent Activity</h2>
+            <h2 className="text-xl font-semibold dark-text-primary">Recent Activity</h2>
             <Button asChild variant="outline" size="sm">
               <a href="/rooms">View All Rooms</a>
             </Button>
@@ -191,11 +191,11 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <Card className="glass-card">
               <CardContent className="text-center py-12">
-                <Home className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-slate-900 mb-2">No Rooms Yet</h3>
-                <p className="text-slate-600 mb-4">Create your first room to start using AI-powered lighting control</p>
+                <Home className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium dark-text-primary mb-2">No Rooms Yet</h3>
+                <p className="dark-text-secondary mb-4">Create your first room to start using AI-powered lighting control</p>
                 <Button asChild>
                   <a href="/rooms">Add Your First Room</a>
                 </Button>

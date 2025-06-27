@@ -57,6 +57,33 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  /* Enhanced Dark Mode Styles */
+  .dark body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  }
+
+  .dark .bg-white\/60 {
+    background: rgba(30, 41, 59, 0.6) !important;
+    backdrop-filter: blur(12px);
+    border-color: rgba(71, 85, 105, 0.3);
+  }
+
+  .dark .bg-slate-50 {
+    background: rgba(30, 41, 59, 0.8) !important;
+  }
+
+  .dark .text-slate-900 {
+    color: rgb(226 232 240) !important;
+  }
+
+  .dark .text-slate-600 {
+    color: rgb(148 163 184) !important;
+  }
+
+  .dark .border-slate-200 {
+    border-color: rgba(71, 85, 105, 0.4) !important;
+  }
 }
 
 @layer base {
@@ -65,6 +92,28 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-sm border-slate-200 dark:bg-slate-800/60 dark:border-slate-700 transition-colors duration-300;
+  }
+  
+  .glass-card-strong {
+    @apply bg-white/80 backdrop-blur-md border-slate-200 dark:bg-slate-800/80 dark:border-slate-600 transition-colors duration-300;
+  }
+
+  .dark-text-primary {
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  .dark-text-secondary {
+    @apply text-slate-600 dark:text-slate-300;
+  }
+
+  .dark-text-muted {
+    @apply text-slate-500 dark:text-slate-400;
   }
 }
 

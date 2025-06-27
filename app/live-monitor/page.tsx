@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, Camera, Users, Lightbulb, Activity, Clock, Zap } from "lucide-react"
 import Navigation from "@/components/Navigation"
 import { useRooms } from "@/hooks/useRooms"
+import { Room } from "@/types/Room"
 import LiveCamButton from "@/components/LiveCamButton"
 import { useOccupancyStatus } from "@/hooks/useOccupancyStatus"
 
@@ -136,7 +137,7 @@ export default function LiveMonitorPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {liveRooms.map((room) => (
+              {liveRooms.map((room: Room) => (
                 <Card key={room.id} className="bg-white/80 backdrop-blur-sm">
                   <CardHeader>
                     <div className="flex items-center justify-between">

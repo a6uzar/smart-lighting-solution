@@ -81,15 +81,15 @@ export default function AutomationPage() {
   const activeRules = rules.filter((rule) => rule.enabled).length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 transition-colors duration-500">
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Automation Rules</h1>
-            <p className="text-slate-600">Configure smart lighting automation and AI behavior</p>
+            <h1 className="text-3xl font-bold dark-text-primary mb-2">Automation Rules</h1>
+            <p className="dark-text-secondary">Configure smart lighting automation and AI behavior</p>
           </div>
 
           <Dialog>
@@ -113,30 +113,30 @@ export default function AutomationPage() {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-blue-600 mb-2">{rules.length}</div>
-              <div className="text-sm text-slate-600">Total Rules</div>
+              <div className="text-sm dark-text-secondary">Total Rules</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-green-600 mb-2">{activeRules}</div>
-              <div className="text-sm text-slate-600">Active Rules</div>
+              <div className="text-sm dark-text-secondary">Active Rules</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+          <Card className="glass-card">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
-              <div className="text-sm text-slate-600">AI Monitoring</div>
+              <div className="text-sm dark-text-secondary">AI Monitoring</div>
             </CardContent>
           </Card>
         </div>
 
         {/* AI Configuration */}
-        <Card className="mb-8 bg-white/60 backdrop-blur-sm border-slate-200">
+        <Card className="mb-8 glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Zap className="w-5 h-5" />
@@ -146,29 +146,29 @@ export default function AutomationPage() {
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h3 className="font-medium text-slate-900">Detection Parameters</h3>
+                <h3 className="font-medium dark-text-primary">Detection Parameters</h3>
 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                     <div>
-                      <div className="font-medium text-slate-900">Real-time Processing</div>
-                      <div className="text-sm text-slate-600">Continuous AI analysis of camera feeds</div>
+                      <div className="font-medium dark-text-primary">Real-time Processing</div>
+                      <div className="text-sm dark-text-secondary">Continuous AI analysis of camera feeds</div>
                     </div>
                     <Switch defaultChecked />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                     <div>
-                      <div className="font-medium text-slate-900">Auto Light Control</div>
-                      <div className="text-sm text-slate-600">Automatically control lights based on occupancy</div>
+                      <div className="font-medium dark-text-primary">Auto Light Control</div>
+                      <div className="text-sm dark-text-secondary">Automatically control lights based on occupancy</div>
                     </div>
                     <Switch defaultChecked />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                     <div>
-                      <div className="font-medium text-slate-900">Motion Sensitivity</div>
-                      <div className="text-sm text-slate-600">High sensitivity for person detection</div>
+                      <div className="font-medium dark-text-primary">Motion Sensitivity</div>
+                      <div className="text-sm dark-text-secondary">High sensitivity for person detection</div>
                     </div>
                     <Badge variant="outline">High</Badge>
                   </div>
@@ -176,29 +176,29 @@ export default function AutomationPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-medium text-slate-900">Performance Metrics</h3>
+                <h3 className="font-medium dark-text-primary">Performance Metrics</h3>
 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                     <div>
-                      <div className="font-medium text-slate-900">Detection Accuracy</div>
-                      <div className="text-sm text-slate-600">Average confidence score</div>
+                      <div className="font-medium dark-text-primary">Detection Accuracy</div>
+                      <div className="text-sm dark-text-secondary">Average confidence score</div>
                     </div>
                     <Badge className="bg-green-100 text-green-800">87%</Badge>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                     <div>
-                      <div className="font-medium text-slate-900">Response Time</div>
-                      <div className="text-sm text-slate-600">Average detection to action time</div>
+                      <div className="font-medium dark-text-primary">Response Time</div>
+                      <div className="text-sm dark-text-secondary">Average detection to action time</div>
                     </div>
                     <Badge className="bg-blue-100 text-blue-800">1.2s</Badge>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                     <div>
-                      <div className="font-medium text-slate-900">Uptime</div>
-                      <div className="text-sm text-slate-600">System availability</div>
+                      <div className="font-medium dark-text-primary">Uptime</div>
+                      <div className="text-sm dark-text-secondary">System availability</div>
                     </div>
                     <Badge className="bg-purple-100 text-purple-800">99.8%</Badge>
                   </div>
@@ -209,7 +209,7 @@ export default function AutomationPage() {
         </Card>
 
         {/* Automation Rules */}
-        <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Settings className="w-5 h-5" />
@@ -219,13 +219,13 @@ export default function AutomationPage() {
           <CardContent>
             <div className="space-y-4">
               {rules.map((rule) => (
-                <div key={rule.id} className="border border-slate-200 rounded-lg p-4 bg-white/40">
+                <div key={rule.id} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-white/40 dark:bg-slate-800/40">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <Switch checked={rule.enabled} onCheckedChange={() => toggleRule(rule.id)} />
                       <div>
-                        <h3 className="font-medium text-slate-900">{rule.name}</h3>
-                        <p className="text-sm text-slate-600">
+                        <h3 className="font-medium dark-text-primary">{rule.name}</h3>
+                        <p className="text-sm dark-text-secondary">
                           Created {new Date(rule.createdAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -246,24 +246,24 @@ export default function AutomationPage() {
                         <Settings className="w-4 h-4 text-slate-600" />
                       )}
                       <div>
-                        <div className="font-medium text-slate-900">Trigger</div>
-                        <div className="text-slate-600">{rule.trigger.condition}</div>
+                        <div className="font-medium dark-text-primary">Trigger</div>
+                        <div className="dark-text-secondary">{rule.trigger.condition}</div>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <Lightbulb className="w-4 h-4 text-yellow-600" />
                       <div>
-                        <div className="font-medium text-slate-900">Action</div>
-                        <div className="text-slate-600">{rule.action.value}</div>
+                        <div className="font-medium dark-text-primary">Action</div>
+                        <div className="dark-text-secondary">{rule.action.value}</div>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <Settings className="w-4 h-4 text-slate-600" />
                       <div>
-                        <div className="font-medium text-slate-900">Applies to</div>
-                        <div className="text-slate-600">{rule.rooms.join(", ")}</div>
+                        <div className="font-medium dark-text-primary">Applies to</div>
+                        <div className="dark-text-secondary">{rule.rooms.join(", ")}</div>
                       </div>
                     </div>
                   </div>

@@ -6,6 +6,7 @@ export interface Room {
   occupancyStatus: "occupied" | "empty"
   lightStatus: "on" | "off"
   liveMonitoringEnabled: boolean
+  aiControlEnabled: boolean
   createdAt: Date
   updatedAt: Date
 }
