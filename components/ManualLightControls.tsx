@@ -1,296 +1,276 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Lightbulb, Palette, Sun, Power, RotateCcw } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-
-interface LightSettings {
-  isOn: boolean
-  brightness: number
-  color: string
-  temperature: number
-  manualOverride: boolean
-}
+import {
+  Lightbulb,
+  Settings,
+  Palette,
+  Sun,
+  Moon,
+  Sunrise,
+  Sunset,
+  ChevronDown,
+  ChevronUp,
+  Power,
+  Thermometer,
+} from "lucide-react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import type { Room, LightSettings } from "@/types/Room"
 
 interface ManualLightControlsProps {
-  roomId: string
-  roomName: string
-  isLiveMonitoring: boolean
+  room: Room
   onSettingsChange: (settings: LightSettings) => void
   className?: string
 }
 
 const colorPresets = [
-  { name: "Warm White", color: "#FFF8DC", temp: 2700 },
-  { name: "Cool White", color: "#F0F8FF", temp: 5000 },
-  { name: "Daylight", color: "#FFFAFA", temp: 6500 },
-  { name: "Soft Red", color: "#FFB6C1", temp: 2000 },
-  { name: "Ocean Blue", color: "#87CEEB", temp: 7000 },
-  { name: "Forest Green", color: "#90EE90", temp: 4000 },
+  { name: "Warm White", value: "warm-white", temp: 2700, color: "#FFB366" },
+  { name: "Soft White", value: "soft-white", temp: 3000, color: "#FFC649" },
+  { name: "Cool White", value: "cool-white", temp: 4000, color: "#FFE135" },
+  { name: "Daylight", value: "daylight", temp: 5000, color: "#FFFFFF" },
+  { name: "Cool Blue", value: "cool-blue", temp: 6500, color: "#B3D9FF" },
+  { name: "Energizing", value: "energizing", temp: 7000, color: "#9FCDFF" },
 ]
 
-export default function ManualLightControls({
-  roomId,
-  roomName,
-  isLiveMonitoring,
-  onSettingsChange,
-  className = "",
-}: ManualLightControlsProps) {
+export default function ManualLightControls({ room, onSettingsChange, className = "" }: ManualLightControlsProps) {
+  const [isOpen, setIsOpen] = useState(false)
   const [settings, setSettings] = useState<LightSettings>({
-    isOn: false,
-    brightness: 75,
-    color: "#FFF8DC",
-    temperature: 2700,
-    manualOverride: false,
+    isOn: room.lightStatus === "on",
+    brightness: room.brightness || 80,
+    colorTemperature: room.colorTemperature || 3000,
+    colorPreset: room.colorPreset || "warm-white",
+    manualOverride: room.manualOverride || false,
   })
 
-  const [hasChanges, setHasChanges] = useState(false)
-
+  // Update settings when room changes
   useEffect(() => {
-    // Load saved settings for this room
-    const savedSettings = localStorage.getItem(`light-settings-${roomId}`)
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings)
-        setSettings(parsed)
-      } catch (error) {
-        console.error("Failed to load light settings:", error)
-      }
-    }
-  }, [roomId])
+    setSettings({
+      isOn: room.lightStatus === "on",
+      brightness: room.brightness || 80,
+      colorTemperature: room.colorTemperature || 3000,
+      colorPreset: room.colorPreset || "warm-white",
+      manualOverride: room.manualOverride || false,
+    })
+  }, [room])
 
-  const updateSettings = (newSettings: Partial<LightSettings>) => {
-    const updated = { ...settings, ...newSettings }
-    setSettings(updated)
-    setHasChanges(true)
-
-    // Save to localStorage
-    localStorage.setItem(`light-settings-${roomId}`, JSON.stringify(updated))
-
-    // Notify parent component
-    onSettingsChange(updated)
+  const handleSettingChange = (newSettings: Partial<LightSettings>) => {
+    const updatedSettings = { ...settings, ...newSettings }
+    setSettings(updatedSettings)
+    onSettingsChange(updatedSettings)
   }
 
-  const handlePowerToggle = (isOn: boolean) => {
-    updateSettings({ isOn, manualOverride: true })
+  const handlePresetSelect = (preset: (typeof colorPresets)[0]) => {
+    handleSettingChange({
+      colorPreset: preset.value,
+      colorTemperature: preset.temp,
+    })
   }
 
-  const handleBrightnessChange = (value: number[]) => {
-    updateSettings({ brightness: value[0], manualOverride: true })
+  const getTemperatureIcon = (temp: number) => {
+    if (temp <= 3000) return <Sunset className="w-4 h-4" />
+    if (temp <= 4000) return <Sun className="w-4 h-4" />
+    if (temp <= 5000) return <Sunrise className="w-4 h-4" />
+    return <Moon className="w-4 h-4" />
   }
 
-  const handleColorSelect = (color: string, temperature: number) => {
-    updateSettings({ color, temperature, manualOverride: true })
-  }
-
-  const handleManualOverrideToggle = (enabled: boolean) => {
-    updateSettings({ manualOverride: enabled })
-    if (!enabled) {
-      setHasChanges(false)
-    }
-  }
-
-  const resetToDefaults = () => {
-    const defaults: LightSettings = {
-      isOn: false,
-      brightness: 75,
-      color: "#FFF8DC",
-      temperature: 2700,
-      manualOverride: false,
-    }
-    setSettings(defaults)
-    setHasChanges(false)
-    localStorage.setItem(`light-settings-${roomId}`, JSON.stringify(defaults))
-    onSettingsChange(defaults)
-  }
+  const selectedPreset = colorPresets.find((p) => p.value === settings.colorPreset)
 
   return (
-    <Card className={`${className} transition-all duration-300`}>
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-            <Lightbulb className="w-5 h-5 text-yellow-500" />
-            <span>Manual Light Controls</span>
-          </CardTitle>
-          <div className="flex items-center space-x-2">
-            {settings.manualOverride && (
-              <Badge
-                variant="secondary"
-                className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
-              >
-                Override Active
-              </Badge>
-            )}
-            {isLiveMonitoring && !settings.manualOverride && (
-              <Badge variant="secondary" className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                AI Controlled
-              </Badge>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-6">
-        {/* Manual Override Toggle */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg border border-orange-100 dark:border-orange-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center">
-              <Power className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-white">Manual Override</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {settings.manualOverride ? "Manual control active" : "AI control active"}
-              </p>
-            </div>
-          </div>
-          <Switch
-            checked={settings.manualOverride}
-            onCheckedChange={handleManualOverrideToggle}
-            className="data-[state=checked]:bg-orange-600"
-          />
-        </div>
-
-        {/* Light Power Control */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Light Power</label>
-            <Switch
-              checked={settings.isOn}
-              onCheckedChange={handlePowerToggle}
-              disabled={!settings.manualOverride}
-              className="data-[state=checked]:bg-yellow-600"
-            />
-          </div>
-
-          {settings.isOn && (
-            <div className="ml-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+    <Card
+      className={`bg-white/80 backdrop-blur-sm border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 ${className}`}
+    >
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                  <Settings className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg text-slate-900 dark:text-slate-100">Manual Light Controls</CardTitle>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Override AI automation with manual settings
+                  </p>
+                </div>
+              </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
-                <span className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">Light is ON</span>
+                {settings.manualOverride && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                  >
+                    Override Active
+                  </Badge>
+                )}
+                {isOpen ? (
+                  <ChevronUp className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                )}
               </div>
             </div>
-          )}
-        </div>
+          </CardHeader>
+        </CollapsibleTrigger>
 
-        <Separator />
+        <CollapsibleContent>
+          <CardContent className="space-y-6">
+            {/* Manual Override Toggle */}
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-orange-500 rounded-lg">
+                  <Power className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">Manual Override</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Take control over AI automation</p>
+                </div>
+              </div>
+              <Switch
+                checked={settings.manualOverride}
+                onCheckedChange={(checked) => handleSettingChange({ manualOverride: checked })}
+              />
+            </div>
 
-        {/* Brightness Control */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center space-x-2">
-              <Sun className="w-4 h-4" />
-              <span>Brightness</span>
-            </label>
-            <span className="text-sm text-slate-500 dark:text-slate-400">{settings.brightness}%</span>
-          </div>
-          <Slider
-            value={[settings.brightness]}
-            onValueChange={handleBrightnessChange}
-            max={100}
-            min={1}
-            step={1}
-            disabled={!settings.manualOverride || !settings.isOn}
-            className="w-full"
-          />
-        </div>
-
-        <Separator />
-
-        {/* Color Temperature Control */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center space-x-2">
-              <Palette className="w-4 h-4" />
-              <span>Color & Temperature</span>
-            </label>
-            <span className="text-sm text-slate-500 dark:text-slate-400">{settings.temperature}K</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            {colorPresets.map((preset) => (
-              <button
-                key={preset.name}
-                onClick={() => handleColorSelect(preset.color, preset.temp)}
-                disabled={!settings.manualOverride || !settings.isOn}
-                className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                  settings.color === preset.color
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
-                } ${!settings.manualOverride || !settings.isOn ? "opacity-50 cursor-not-allowed" : "hover:shadow-md"}`}
-              >
-                <div className="flex items-center space-x-2">
-                  <div
-                    className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600"
-                    style={{ backgroundColor: preset.color }}
-                  />
-                  <div className="text-left">
-                    <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{preset.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{preset.temp}K</p>
+            {settings.manualOverride && (
+              <>
+                {/* Power Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Lightbulb className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                      <span className="font-medium text-slate-900 dark:text-slate-100">Power</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={settings.isOn}
+                        onCheckedChange={(checked) => handleSettingChange({ isOn: checked })}
+                      />
+                      <Badge variant={settings.isOn ? "default" : "secondary"}>{settings.isOn ? "ON" : "OFF"}</Badge>
+                    </div>
                   </div>
                 </div>
-              </button>
-            ))}
-          </div>
-        </div>
 
-        {/* Current Status */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-600">
-          <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Current Status</h4>
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Power:</span>
-              <span
-                className={`ml-2 font-medium ${settings.isOn ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
-              >
-                {settings.isOn ? "ON" : "OFF"}
-              </span>
-            </div>
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Brightness:</span>
-              <span className="ml-2 font-medium text-slate-700 dark:text-slate-300">{settings.brightness}%</span>
-            </div>
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Temperature:</span>
-              <span className="ml-2 font-medium text-slate-700 dark:text-slate-300">{settings.temperature}K</span>
-            </div>
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Control:</span>
-              <span className="ml-2 font-medium text-slate-700 dark:text-slate-300">
-                {settings.manualOverride ? "Manual" : "AI"}
-              </span>
-            </div>
-          </div>
-        </div>
+                <Separator className="dark:bg-slate-700" />
 
-        {/* Reset Button */}
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={resetToDefaults}
-            className="flex items-center space-x-2 bg-transparent"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>Reset to Defaults</span>
-          </Button>
-        </div>
+                {/* Brightness Control */}
+                {settings.isOn && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Sun className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                        <span className="font-medium text-slate-900 dark:text-slate-100">Brightness</span>
+                      </div>
+                      <Badge variant="outline" className="dark:border-slate-600">
+                        {settings.brightness}%
+                      </Badge>
+                    </div>
+                    <Slider
+                      value={[settings.brightness]}
+                      onValueChange={([value]) => handleSettingChange({ brightness: value })}
+                      max={100}
+                      min={1}
+                      step={1}
+                      className="w-full"
+                    />
+                  </div>
+                )}
 
-        {/* Override Warning */}
-        {settings.manualOverride && isLiveMonitoring && (
-          <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <p className="text-sm text-amber-700 dark:text-amber-300">
-              <strong>Manual Override Active:</strong> These settings will take precedence over AI automation until
-              override is disabled.
-            </p>
-          </div>
-        )}
-      </CardContent>
+                {settings.isOn && (
+                  <>
+                    <Separator className="dark:bg-slate-700" />
+
+                    {/* Color Temperature */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Thermometer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                          <span className="font-medium text-slate-900 dark:text-slate-100">Color Temperature</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {getTemperatureIcon(settings.colorTemperature)}
+                          <Badge variant="outline" className="dark:border-slate-600">
+                            {settings.colorTemperature}K
+                          </Badge>
+                        </div>
+                      </div>
+                      <Slider
+                        value={[settings.colorTemperature]}
+                        onValueChange={([value]) => handleSettingChange({ colorTemperature: value })}
+                        max={7000}
+                        min={2700}
+                        step={100}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <Separator className="dark:bg-slate-700" />
+
+                    {/* Color Presets */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Palette className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                        <span className="font-medium text-slate-900 dark:text-slate-100">Color Presets</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {colorPresets.map((preset) => (
+                          <Button
+                            key={preset.value}
+                            variant={settings.colorPreset === preset.value ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePresetSelect(preset)}
+                            className="justify-start space-x-2 dark:border-slate-600"
+                          >
+                            <div
+                              className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600"
+                              style={{ backgroundColor: preset.color }}
+                            />
+                            <span className="text-xs">{preset.name}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <Separator className="dark:bg-slate-700" />
+
+                {/* Current Status */}
+                <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600 dark:text-slate-400">Current Status:</span>
+                    <div className="flex items-center space-x-2">
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: settings.isOn ? selectedPreset?.color || "#FFB366" : "#94a3b8",
+                        }}
+                      />
+                      <span className="text-slate-900 dark:text-slate-100">
+                        {settings.isOn ? `${selectedPreset?.name} at ${settings.brightness}%` : "Off"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {!settings.manualOverride && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 text-center">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  Enable manual override to take control of the lights
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   )
 }
