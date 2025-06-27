@@ -104,56 +104,6 @@ export function useRooms() {
     return rooms.find((room) => room.id === id)
   }
 
-  // Get rooms with live monitoring enabled
-  const getLiveMonitoringRooms = () => {
-    return rooms.filter((room) => room.liveMonitoringEnabled)
-  }
-
-  // Toggle live monitoring for a room
-  const toggleLiveMonitoring = (id: string) => {
-    setRooms((prev) =>
-      prev.map((room) =>
-        room.id === id
-          ? {
-              ...room,
-              liveMonitoringEnabled: !room.liveMonitoringEnabled,
-              updatedAt: new Date(),
-            }
-          : room,
-      ),
-    )
-  }
-
-  // Update light status for a room
-  const updateLightStatus = (id: string, status: "on" | "off") => {
-    setRooms((prev) =>
-      prev.map((room) =>
-        room.id === id
-          ? {
-              ...room,
-              lightStatus: status,
-              updatedAt: new Date(),
-            }
-          : room,
-      ),
-    )
-  }
-
-  // Update occupancy status for a room
-  const updateOccupancyStatus = (id: string, status: "occupied" | "empty") => {
-    setRooms((prev) =>
-      prev.map((room) =>
-        room.id === id
-          ? {
-              ...room,
-              occupancyStatus: status,
-              updatedAt: new Date(),
-            }
-          : room,
-      ),
-    )
-  }
-
   return {
     rooms,
     isLoading,
@@ -161,9 +111,5 @@ export function useRooms() {
     updateRoom,
     deleteRoom,
     getRoomById,
-    getLiveMonitoringRooms,
-    toggleLiveMonitoring,
-    updateLightStatus,
-    updateOccupancyStatus,
   }
 }
