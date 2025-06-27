@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Settings, BarChart3, Home } from "lucide-react"
+import { Plus } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import RoomCard from "@/components/RoomCard"
+import Navigation from "@/components/Navigation"
 import { useRooms } from "@/hooks/useRooms"
 
 export default function Dashboard() {
@@ -33,47 +34,18 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Home className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-900">Smart Lighting Control</h1>
-            </div>
-            <nav className="flex items-center space-x-4">
-              <Link href="/rooms">
-                <Button variant="ghost" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Rooms
-                </Button>
-              </Link>
-              <Link href="/automation">
-                <Button variant="ghost" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Automation
-                </Button>
-              </Link>
-              <Link href="/analytics">
-                <Button variant="ghost" size="sm">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Analytics
-                </Button>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
@@ -129,10 +101,13 @@ export default function Dashboard() {
         {rooms.length === 0 ? (
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Home className="w-12 h-12 text-slate-400 mb-4" />
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-4">
+                <Plus className="w-8 h-8 text-slate-400" />
+              </div>
               <h3 className="text-lg font-medium text-slate-900 mb-2">No rooms configured</h3>
-              <p className="text-slate-600 text-center mb-4">
-                Get started by adding your first room to begin smart lighting automation.
+              <p className="text-slate-600 text-center mb-4 max-w-md">
+                Get started by adding your first room to begin smart lighting automation with AI-powered occupancy
+                detection.
               </p>
               <Link href="/rooms">
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">

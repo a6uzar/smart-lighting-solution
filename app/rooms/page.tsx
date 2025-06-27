@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Plus, Edit, Trash2 } from "lucide-react"
-import Link from "next/link"
+import { Plus, Edit, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import RoomForm from "@/components/RoomForm"
+import Navigation from "@/components/Navigation"
 import type { Room } from "@/types/Room"
 import { useRooms } from "@/hooks/useRooms"
 import { useToast } from "@/hooks/use-toast"
@@ -48,32 +48,25 @@ export default function RoomsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="mr-4">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-xl font-bold text-slate-900">Room Management</h1>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Manage Rooms</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Room Management</h2>
+            <p className="text-slate-600 mt-1">Create, edit, and manage your smart lighting rooms</p>
+          </div>
           <Button
             onClick={() => setShowForm(true)}
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -105,7 +98,10 @@ export default function RoomsPage() {
         {/* Rooms List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {rooms.map((room) => (
-            <Card key={room.id} className="bg-white/60 backdrop-blur-sm border-slate-200">
+            <Card
+              key={room.id}
+              className="bg-white/60 backdrop-blur-sm border-slate-200 hover:shadow-lg transition-shadow"
+            >
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -120,7 +116,7 @@ export default function RoomsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteRoom(room.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -147,10 +143,12 @@ export default function RoomsPage() {
         {rooms.length === 0 && (
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Plus className="w-12 h-12 text-slate-400 mb-4" />
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-4">
+                <Plus className="w-8 h-8 text-slate-400" />
+              </div>
               <h3 className="text-lg font-medium text-slate-900 mb-2">No rooms yet</h3>
-              <p className="text-slate-600 text-center mb-4">
-                Create your first room to start managing smart lighting automation.
+              <p className="text-slate-600 text-center mb-4 max-w-md">
+                Create your first room to start managing smart lighting automation with AI-powered occupancy detection.
               </p>
               <Button
                 onClick={() => setShowForm(true)}

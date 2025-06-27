@@ -5,28 +5,24 @@ export async function POST(request: NextRequest) {
     const { roomId } = await request.json()
 
     if (!roomId) {
-      return NextResponse.json({ error: "roomId is required" }, { status: 400 })
+      return NextResponse.json({ success: false, error: "Missing room ID" }, { status: 400 })
     }
 
-    // Simulate live camera processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    // Simulate AI processing delay
+    await new Promise((resolve) => setTimeout(resolve, 3000))
 
     // Simulate YOLOv8 live detection result
-    const occupied = Math.random() > 0.3 // 70% chance of detecting occupancy in live mode
-    const confidence = 0.75 + Math.random() * 0.25 // 75-100% confidence for live detection
+    const isOccupied = Math.random() > 0.3 // 70% chance of detecting a person
+    const confidence = Math.round((Math.random() * 0.2 + 0.8) * 100) // 80-100% confidence
 
     return NextResponse.json({
       success: true,
-      roomId,
-      detection: {
-        occupied,
-        confidence: Math.round(confidence * 100) / 100,
-        timestamp: new Date().toISOString(),
-        source: "live_camera",
-      },
+      occupancy: isOccupied,
+      confidence,
+      message: `Live detection: ${isOccupied ? "Person detected" : "No person detected"} with ${confidence}% confidence`,
     })
   } catch (error) {
-    console.error("Live detection error:", error)
-    return NextResponse.json({ error: "Failed to process live detection" }, { status: 500 })
+    console.error("Live detect error:", error)
+    return NextResponse.json({ success: false, error: "Failed to process live detection" }, { status: 500 })
   }
 }

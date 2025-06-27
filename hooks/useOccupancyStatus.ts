@@ -1,61 +1,35 @@
 "use client"
 
-import { useState } from "react"
-import { useRooms } from "./useRooms"
-import { useToast } from "./use-toast"
+import { useCallback } from "react"
 
 export function useOccupancyStatus() {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const { updateRoomStatus } = useRooms()
-  const { toast } = useToast()
-
-  const simulateAIDetection = async (
-    type: "image" | "camera",
-    file?: File,
-  ): Promise<{ occupied: boolean; confidence: number }> => {
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2000 + Math.random() * 2000))
-
-    // Simulate detection results with some randomness
-    const occupied = Math.random() > 0.4 // 60% chance of detecting occupancy
-    const confidence = 0.7 + Math.random() * 0.3 // 70-100% confidence
-
-    return { occupied, confidence }
-  }
-
-  const updateOccupancyStatus = async (roomId: string, type: "image" | "camera", file?: File) => {
-    setIsProcessing(true)
+  const updateOccupancyStatus = useCallback((roomId: string, status: "occupied" | "empty") => {
+    // Get current rooms from localStorage
+    const stored = localStorage.getItem("smart-lighting-rooms")
+    if (!stored) return
 
     try {
-      toast({
-        title: "AI Detection Started",
-        description: `Processing ${type === "image" ? "uploaded image" : "live camera feed"} for occupancy detection...`,
+      const rooms = JSON.parse(stored)
+      const updatedRooms = rooms.map((room: any) => {
+        if (room.id === roomId) {
+          return {
+            ...room,
+            occupancyStatus: status,
+            lightStatus: status === "occupied" ? "on" : "off",
+            updatedAt: new Date().toISOString(),
+          }
+        }
+        return room
       })
 
-      const result = await simulateAIDetection(type, file)
+      localStorage.setItem("smart-lighting-rooms", JSON.stringify(updatedRooms))
 
-      const occupancyStatus = result.occupied ? "occupied" : "empty"
-      const lightStatus = result.occupied ? "on" : "off"
-
-      updateRoomStatus(roomId, occupancyStatus, lightStatus)
-
-      toast({
-        title: "AI Detection Complete",
-        description: `${result.occupied ? "Person detected" : "No person detected"} (${Math.round(result.confidence * 100)}% confidence). Lights ${lightStatus}.`,
-      })
+      // Trigger a storage event to update other components
+      window.dispatchEvent(new Event("storage"))
     } catch (error) {
-      toast({
-        title: "Detection Failed",
-        description: "Failed to process AI detection. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsProcessing(false)
+      console.error("Failed to update occupancy status:", error)
     }
-  }
+  }, [])
 
-  return {
-    updateOccupancyStatus,
-    isProcessing,
-  }
+  return { updateOccupancyStatus }
 }

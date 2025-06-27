@@ -1,10 +1,9 @@
 "use client"
 
-import { ArrowLeft, TrendingUp, Clock, Zap, Users } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { TrendingUp, Clock, Zap, Users } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ChartPanel from "@/components/ChartPanel"
+import Navigation from "@/components/Navigation"
 
 export default function AnalyticsPage() {
   const stats = {
@@ -16,29 +15,23 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="mr-4">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-xl font-bold text-slate-900">Analytics Dashboard</h1>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-900">Analytics Dashboard</h2>
+          <p className="text-slate-600 mt-1">Monitor your smart lighting system performance and energy usage</p>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Total Detections</CardTitle>
-                <Users className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-4 h-4 text-blue-600" />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -54,7 +47,9 @@ export default function AnalyticsPage() {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Avg Occupancy</CardTitle>
-                <Clock className="w-4 h-4 text-green-600" />
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-green-600" />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -70,7 +65,9 @@ export default function AnalyticsPage() {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Energy Saved</CardTitle>
-                <Zap className="w-4 h-4 text-purple-600" />
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-purple-600" />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -86,7 +83,9 @@ export default function AnalyticsPage() {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-slate-600">Peak Hours</CardTitle>
-                <Clock className="w-4 h-4 text-orange-600" />
+                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-orange-600" />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -152,14 +151,14 @@ export default function AnalyticsPage() {
               ].map((activity, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between py-2 border-b border-slate-100 last:border-b-0"
+                  className="flex items-center justify-between py-3 px-4 bg-slate-50 rounded-lg border-l-4 border-l-blue-500"
                 >
                   <div>
                     <p className="text-sm font-medium text-slate-900">{activity.action}</p>
                     <p className="text-xs text-slate-600">{activity.time}</p>
                   </div>
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${
+                    className={`px-3 py-1 text-xs font-medium rounded-full ${
                       activity.status === "occupied"
                         ? "bg-green-100 text-green-800"
                         : activity.status === "empty"

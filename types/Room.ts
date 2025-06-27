@@ -1,20 +1,19 @@
 export interface Room {
   id: string
   name: string
-  description: string
-  imageUrl: string
+  description?: string
+  imageUrl?: string
   occupancyStatus: "occupied" | "empty"
   lightStatus: "on" | "off"
-  aiControlEnabled: boolean
-  manualOverride: boolean
   createdAt: string
   updatedAt: string
 }
 
 export interface DetectionResult {
-  occupied: boolean
+  success: boolean
+  occupancy: boolean
   confidence: number
-  timestamp: string
+  error?: string
 }
 
 export interface AutomationRule {
@@ -22,15 +21,15 @@ export interface AutomationRule {
   name: string
   enabled: boolean
   conditions: {
-    occupancyStatus?: "occupied" | "empty"
+    occupancy?: boolean
     timeRange?: {
       start: string
       end: string
     }
-    daysOfWeek?: number[]
+    dayOfWeek?: number[]
   }
   actions: {
-    lightStatus: "on" | "off"
+    lightStatus?: "on" | "off"
     dimLevel?: number
   }
 }

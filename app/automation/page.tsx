@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Clock, Zap, Moon, Sun } from "lucide-react"
-import Link from "next/link"
+import { Clock, Zap, Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Navigation from "@/components/Navigation"
 
 export default function AutomationPage() {
   const [autoTurnOff, setAutoTurnOff] = useState(true)
@@ -19,29 +19,23 @@ export default function AutomationPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="mr-4">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-xl font-bold text-slate-900">Automation Rules</h1>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-900">Automation Rules</h2>
+          <p className="text-slate-600 mt-1">Configure smart lighting automation and AI detection settings</p>
+        </div>
+
         <div className="space-y-6">
           {/* Auto Turn Off */}
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                  </div>
                   <div>
                     <CardTitle>Auto Turn Off</CardTitle>
                     <p className="text-sm text-slate-600 mt-1">
@@ -67,6 +61,10 @@ export default function AutomationPage() {
                       step={1}
                       className="mt-2"
                     />
+                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                      <span>1 min</span>
+                      <span>30 min</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -78,7 +76,9 @@ export default function AutomationPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Moon className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Moon className="w-5 h-5 text-purple-600" />
+                  </div>
                   <div>
                     <CardTitle>Night Mode</CardTitle>
                     <p className="text-sm text-slate-600 mt-1">Dim lights automatically during night hours</p>
@@ -102,6 +102,10 @@ export default function AutomationPage() {
                   <div>
                     <label className="text-sm font-medium text-slate-700">Dim Level: {dimLevel[0]}%</label>
                     <Slider value={dimLevel} onValueChange={setDimLevel} max={80} min={10} step={5} className="mt-2" />
+                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                      <span>10%</span>
+                      <span>80%</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -112,7 +116,9 @@ export default function AutomationPage() {
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardHeader>
               <div className="flex items-center space-x-3">
-                <Zap className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-green-600" />
+                </div>
                 <div>
                   <CardTitle>Motion Detection Settings</CardTitle>
                   <p className="text-sm text-slate-600 mt-1">Configure AI-based occupancy detection sensitivity</p>
@@ -142,7 +148,9 @@ export default function AutomationPage() {
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardHeader>
               <div className="flex items-center space-x-3">
-                <Sun className="w-5 h-5 text-yellow-600" />
+                <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <Sun className="w-5 h-5 text-yellow-600" />
+                </div>
                 <div>
                   <CardTitle>Energy Saving Mode</CardTitle>
                   <p className="text-sm text-slate-600 mt-1">Optimize lighting for maximum energy efficiency</p>
@@ -162,6 +170,13 @@ export default function AutomationPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              Save Automation Settings
+            </Button>
+          </div>
         </div>
       </main>
     </div>
