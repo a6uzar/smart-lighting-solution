@@ -3,14 +3,13 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { Upload, Loader2, AlertCircle } from "lucide-react"
+import { Upload, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
 
 interface UploadImageButtonProps {
   roomId: string
-  onDetectionResult: (isOccupied: boolean) => void
+  onDetectionResult: (isOccupied: boolean, confidence?: number) => void
   disabled?: boolean
   className?: string
   children?: React.ReactNode
@@ -20,27 +19,46 @@ export default function UploadImageButton({
   roomId,
   onDetectionResult,
   disabled = false,
-  className,
+  className = "",
   children,
 }: UploadImageButtonProps) {
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (disabled) return
-
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
-    setIsProcessing(true)
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image smaller than 10MB",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsUploading(true)
 
     try {
       const formData = new FormData()
       formData.append("image", file)
       formData.append("roomId", roomId)
+      formData.append("mode", "upload")
 
-      const response = await fetch("/api/upload-image", {
+      const response = await fetch("/api/ai-detection", {
         method: "POST",
         body: formData,
       })
@@ -48,22 +66,24 @@ export default function UploadImageButton({
       const result = await response.json()
 
       if (result.success) {
-        onDetectionResult(result.occupancy)
+        onDetectionResult(result.occupied, result.confidence)
         toast({
-          title: "Image analyzed successfully",
-          description: `${result.occupancy ? "Person detected" : "No person detected"} - Lights ${result.occupancy ? "turned ON" : "turned OFF"}`,
+          title: "Analysis Complete",
+          description: `Room is ${result.occupied ? "occupied" : "empty"} (${Math.round(result.confidence)}% confidence)`,
         })
       } else {
         throw new Error(result.error || "Analysis failed")
       }
     } catch (error) {
+      console.error("Upload error:", error)
       toast({
-        title: "Analysis failed",
-        description: "Failed to analyze the uploaded image. Please try again.",
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to analyze image",
         variant: "destructive",
       })
     } finally {
-      setIsProcessing(false)
+      setIsUploading(false)
+      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
@@ -71,15 +91,9 @@ export default function UploadImageButton({
   }
 
   const handleClick = () => {
-    if (disabled) {
-      toast({
-        title: "Upload disabled",
-        description: "Live monitoring is active. Disable live monitoring to upload images manually.",
-        variant: "destructive",
-      })
-      return
+    if (!disabled && fileInputRef.current) {
+      fileInputRef.current.click()
     }
-    fileInputRef.current?.click()
   }
 
   return (
@@ -88,61 +102,20 @@ export default function UploadImageButton({
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={handleFileUpload}
+        onChange={handleFileSelect}
         className="hidden"
-        disabled={disabled}
+        disabled={disabled || isUploading}
       />
-
-      {children ? (
-        <div
-          onClick={handleClick}
-          className={cn(
-            "cursor-pointer transition-opacity",
-            (isProcessing || disabled) && "opacity-50",
-            disabled && "cursor-not-allowed",
-            className,
-          )}
-        >
-          {isProcessing ? (
-            <div className="flex items-center justify-center space-x-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm font-medium">Analyzing...</span>
-            </div>
-          ) : disabled ? (
-            <div className="flex items-center justify-center space-x-2">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">Disabled</span>
-            </div>
-          ) : (
-            children
-          )}
-        </div>
-      ) : (
-        <Button
-          onClick={handleClick}
-          disabled={isProcessing || disabled}
-          variant="outline"
-          size="sm"
-          className={className}
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Analyzing...
-            </>
-          ) : disabled ? (
-            <>
-              <AlertCircle className="w-4 h-4 mr-2" />
-              Disabled
-            </>
-          ) : (
-            <>
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Image
-            </>
-          )}
-        </Button>
-      )}
+      <Button onClick={handleClick} disabled={disabled || isUploading} className={className} variant="outline">
+        {children || (
+          <>
+            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+            <span className="text-sm font-medium">
+              {isUploading ? "Analyzing..." : disabled ? "Disabled" : "Upload Image"}
+            </span>
+          </>
+        )}
+      </Button>
     </>
   )
 }
