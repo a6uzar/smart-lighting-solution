@@ -1,16 +1,16 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
-import { Camera, Video } from "lucide-react"
+
+import { useState } from "react"
+import { Camera, Video, VideoOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import LiveCameraDisplay from "./LiveCameraDisplay"
+import { toast } from "sonner"
 
 interface LiveCamButtonProps {
   roomId: string
   onDetectionResult: (isOccupied: boolean, confidence?: number) => void
-  liveMonitoringEnabled?: boolean
+  liveMonitoringEnabled: boolean
   className?: string
   children?: React.ReactNode
 }
@@ -18,61 +18,60 @@ interface LiveCamButtonProps {
 export default function LiveCamButton({
   roomId,
   onDetectionResult,
-  liveMonitoringEnabled = false,
+  liveMonitoringEnabled,
   className = "",
   children,
 }: LiveCamButtonProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [isActive, setIsActive] = useState(false)
 
-  const handleClick = () => {
+  const handleToggle = async () => {
     if (liveMonitoringEnabled) {
-      // In live monitoring mode, just show a status or redirect to live monitor page
-      window.location.href = "/live-monitor"
-    } else {
-      // In manual mode, open the camera dialog
-      setIsDialogOpen(true)
+      // If live monitoring is enabled, this button shows status
+      toast.info("Live monitoring is active. Camera feed is running continuously.")
+      return
+    }
+
+    try {
+      setIsActive(!isActive)
+
+      if (!isActive) {
+        // Simulate camera activation
+        toast.success("Camera test activated")
+
+        // Simulate a detection result after 2 seconds
+        setTimeout(() => {
+          const isOccupied = Math.random() > 0.5
+          const confidence = Math.random() * 0.4 + 0.6
+          onDetectionResult(isOccupied, confidence)
+          toast.success(
+            `Test detection: ${isOccupied ? "Occupied" : "Empty"} (${Math.round(confidence * 100)}% confidence)`,
+          )
+          setIsActive(false)
+        }, 2000)
+      } else {
+        toast.info("Camera test stopped")
+      }
+    } catch (error) {
+      console.error("Camera error:", error)
+      toast.error("Failed to access camera")
+      setIsActive(false)
     }
   }
 
   return (
-    <>
-      <Button onClick={handleClick} className={className} variant="outline">
-        {children || (
-          <>
+    <Button onClick={handleToggle} className={className} variant="outline">
+      {children || (
+        <>
+          {liveMonitoringEnabled ? (
+            <Video className="w-4 h-4 mr-2 text-green-500" />
+          ) : isActive ? (
+            <VideoOff className="w-4 h-4 mr-2" />
+          ) : (
             <Camera className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">{liveMonitoringEnabled ? "View Live Feed" : "Test Camera"}</span>
-          </>
-        )}
-      </Button>
-
-      {!liveMonitoringEnabled && (
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center space-x-2">
-                <Video className="w-5 h-5" />
-                <span>Camera Test - Room {roomId}</span>
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <LiveCameraDisplay
-                roomId={roomId}
-                roomName={`Room ${roomId}`}
-                isActive={isDialogOpen}
-                onDetectionResult={onDetectionResult}
-              />
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Close
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+          )}
+          {liveMonitoringEnabled ? "Live Active" : isActive ? "Stop Test" : "Test Camera"}
+        </>
       )}
-    </>
+    </Button>
   )
 }

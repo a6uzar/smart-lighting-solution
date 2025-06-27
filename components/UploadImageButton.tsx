@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useRef } from "react"
 import { Upload, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface UploadImageButtonProps {
   roomId: string
@@ -24,7 +24,6 @@ export default function UploadImageButton({
 }: UploadImageButtonProps) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { toast } = useToast()
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -32,21 +31,13 @@ export default function UploadImageButton({
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast({
-        title: "Invalid File",
-        description: "Please select an image file",
-        variant: "destructive",
-      })
+      toast.error("Please select a valid image file")
       return
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "File Too Large",
-        description: "Please select an image smaller than 10MB",
-        variant: "destructive",
-      })
+      toast.error("Image size must be less than 10MB")
       return
     }
 
@@ -56,31 +47,29 @@ export default function UploadImageButton({
       const formData = new FormData()
       formData.append("image", file)
       formData.append("roomId", roomId)
-      formData.append("mode", "upload")
 
       const response = await fetch("/api/ai-detection", {
         method: "POST",
         body: formData,
       })
 
+      if (!response.ok) {
+        throw new Error("Failed to analyze image")
+      }
+
       const result = await response.json()
 
       if (result.success) {
-        onDetectionResult(result.occupied, result.confidence)
-        toast({
-          title: "Analysis Complete",
-          description: `Room is ${result.occupied ? "occupied" : "empty"} (${Math.round(result.confidence)}% confidence)`,
-        })
+        onDetectionResult(result.occupancy, result.confidence)
+        toast.success(
+          `Detection complete: ${result.occupancy ? "Occupied" : "Empty"} (${Math.round(result.confidence * 100)}% confidence)`,
+        )
       } else {
-        throw new Error(result.error || "Analysis failed")
+        throw new Error(result.error || "Detection failed")
       }
     } catch (error) {
       console.error("Upload error:", error)
-      toast({
-        title: "Upload Failed",
-        description: error instanceof Error ? error.message : "Failed to analyze image",
-        variant: "destructive",
-      })
+      toast.error("Failed to analyze image. Please try again.")
     } finally {
       setIsUploading(false)
       // Reset file input
@@ -91,9 +80,8 @@ export default function UploadImageButton({
   }
 
   const handleClick = () => {
-    if (!disabled && fileInputRef.current) {
-      fileInputRef.current.click()
-    }
+    if (disabled || isUploading) return
+    fileInputRef.current?.click()
   }
 
   return (
@@ -107,13 +95,15 @@ export default function UploadImageButton({
         disabled={disabled || isUploading}
       />
       <Button onClick={handleClick} disabled={disabled || isUploading} className={className} variant="outline">
-        {children || (
-          <>
-            {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-            <span className="text-sm font-medium">
-              {isUploading ? "Analyzing..." : disabled ? "Disabled" : "Upload Image"}
-            </span>
-          </>
+        {isUploading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          children || (
+            <>
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Image
+            </>
+          )
         )}
       </Button>
     </>

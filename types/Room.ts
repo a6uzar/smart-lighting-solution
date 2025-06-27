@@ -6,8 +6,8 @@ export interface Room {
   occupancyStatus: "occupied" | "empty"
   lightStatus: "on" | "off"
   liveMonitoringEnabled: boolean
-  createdAt: string
-  updatedAt: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface DetectionResult {

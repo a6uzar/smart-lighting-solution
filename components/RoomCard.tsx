@@ -1,15 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Camera, Upload, Lightbulb, Users, Eye, EyeOff, Settings } from "lucide-react"
+import { Camera, Upload, Users, Eye, EyeOff, Settings, Sliders } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import StatusBadge from "./StatusBadge"
 import UploadImageButton from "./UploadImageButton"
 import LiveCamButton from "./LiveCamButton"
 import LiveCameraDisplay from "./LiveCameraDisplay"
+import ManualLightControls from "./ManualLightControls"
 import type { Room } from "@/types/Room"
 import { useOccupancyStatus } from "@/hooks/useOccupancyStatus"
 import { useRooms } from "@/hooks/useRooms"
@@ -22,8 +24,8 @@ interface RoomCardProps {
 export default function RoomCard({ room, onEdit }: RoomCardProps) {
   const { updateOccupancyStatus } = useOccupancyStatus()
   const { updateRoom } = useRooms()
-  const [manualOverride, setManualOverride] = useState(false)
   const [isLiveActive, setIsLiveActive] = useState(room.liveMonitoringEnabled)
+  const [showLightControls, setShowLightControls] = useState(false)
 
   // Update live state when room prop changes
   useEffect(() => {
@@ -47,6 +49,19 @@ export default function RoomCard({ room, onEdit }: RoomCardProps) {
       lightStatus: room.lightStatus,
       liveMonitoringEnabled: enabled,
     })
+  }
+
+  const handleLightSettingsChange = (settings: any) => {
+    // Handle light settings changes
+    console.log(`Light settings updated for room ${room.id}:`, settings)
+
+    // Update room light status based on manual override
+    if (settings.manualOverride) {
+      updateRoom(room.id, {
+        ...room,
+        lightStatus: settings.isOn ? "on" : "off",
+      })
+    }
   }
 
   return (
@@ -201,19 +216,26 @@ export default function RoomCard({ room, onEdit }: RoomCardProps) {
           </LiveCamButton>
         </div>
 
-        {/* Manual Override */}
-        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-600 transition-all duration-300">
-          <div className="flex items-center space-x-2">
-            <Lightbulb className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Manual Override</span>
-          </div>
-          <Switch
-            checked={manualOverride}
-            onCheckedChange={setManualOverride}
-            disabled={isLiveActive}
-            className="data-[state=checked]:bg-yellow-600 dark:data-[state=checked]:bg-yellow-500"
-          />
-        </div>
+        {/* Manual Light Controls Toggle */}
+        <Collapsible open={showLightControls} onOpenChange={setShowLightControls}>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="w-full flex items-center justify-between p-3 h-auto bg-transparent">
+              <div className="flex items-center space-x-2">
+                <Sliders className="w-4 h-4" />
+                <span className="text-sm font-medium">Manual Light Controls</span>
+              </div>
+              <div className="text-xs text-slate-500">{showLightControls ? "Hide" : "Show"}</div>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 mt-4">
+            <ManualLightControls
+              roomId={room.id}
+              roomName={room.name}
+              isLiveMonitoring={isLiveActive}
+              onSettingsChange={handleLightSettingsChange}
+            />
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Light Status */}
         <div className="flex items-center justify-between text-sm p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-600 transition-all duration-300">
@@ -225,13 +247,7 @@ export default function RoomCard({ room, onEdit }: RoomCardProps) {
             <span
               className={`font-medium ${room.lightStatus === "on" ? "text-yellow-600 dark:text-yellow-400" : "text-slate-500 dark:text-slate-400"}`}
             >
-              {isLiveActive
-                ? room.lightStatus === "on"
-                  ? "AI ON"
-                  : "AI OFF"
-                : room.lightStatus === "on"
-                  ? "Manual ON"
-                  : "Manual OFF"}
+              {room.lightStatus === "on" ? "ON" : "OFF"}
             </span>
           </div>
         </div>
@@ -240,7 +256,7 @@ export default function RoomCard({ room, onEdit }: RoomCardProps) {
         {isLiveActive && (
           <div className="text-xs text-slate-500 dark:text-slate-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border-l-4 border-green-400 transition-all duration-300">
             <strong className="text-green-700 dark:text-green-300">Live Mode Active:</strong> AI is continuously
-            monitoring this room. Manual controls are limited while live monitoring is active.
+            monitoring this room. Manual light controls can override AI automation when needed.
           </div>
         )}
       </CardContent>
