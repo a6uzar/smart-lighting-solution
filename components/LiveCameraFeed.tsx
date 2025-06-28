@@ -35,6 +35,8 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
   const [isProcessing, setIsProcessing] = useState(false)
   const [lastDetection, setLastDetection] = useState<DetectionResult | null>(null)
   const [detectionHistory, setDetectionHistory] = useState<DetectionResult[]>([])
+  const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [isConnecting, setIsConnecting] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -67,6 +69,9 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
 
   const startCamera = async () => {
     try {
+      setIsConnecting(true)
+      setConnectionError(null)
+      
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -77,16 +82,27 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
 
       setStream(mediaStream)
       setIsConnected(true)
+      setIsConnecting(false)
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
       }
+      
+      toast({
+        title: "Camera Connected",
+        description: `Live monitoring started for ${roomName}`,
+      })
     } catch (error) {
       console.error("Camera access error:", error)
       setIsConnected(false)
+      setIsConnecting(false)
+      
+      const errorMessage = error instanceof Error ? error.message : "Unknown camera error"
+      setConnectionError(errorMessage)
+      
       toast({
         title: "Camera Error",
-        description: `Failed to access camera for ${roomName}`,
+        description: `Failed to access camera for ${roomName}: ${errorMessage}`,
         variant: "destructive",
       })
     }
@@ -98,6 +114,8 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
       setStream(null)
     }
     setIsConnected(false)
+    setIsConnecting(false)
+    setConnectionError(null)
     stopDetectionInterval()
   }
 
@@ -192,10 +210,10 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     // Draw bounding boxes
-    ctx.strokeStyle = "#10B981"
+    ctx.strokeStyle = "#7C3AED" // Purple-600 to match gradient theme
     ctx.lineWidth = 3
     ctx.font = "14px Arial"
-    ctx.fillStyle = "#10B981"
+    ctx.fillStyle = "#7C3AED"
 
     boxes.forEach((box) => {
       ctx.strokeRect(box.x, box.y, box.width, box.height)
@@ -220,7 +238,7 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
 
             {/* Processing overlay */}
             {isProcessing && (
-              <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-full flex items-center space-x-1">
+              <div className="absolute top-2 right-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-2 py-1 rounded-full flex items-center space-x-1">
                 <Loader2 className="w-3 h-3 animate-spin" />
                 <span className="text-xs">AI Processing</span>
               </div>
@@ -230,7 +248,7 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
             <div className="absolute top-2 left-2 flex items-center space-x-2">
               <div className="bg-black/50 backdrop-blur-sm rounded-full px-2 py-1 flex items-center space-x-1">
                 {isConnected ? (
-                  <Wifi className="w-3 h-3 text-green-400" />
+                  <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full" />
                 ) : (
                   <WifiOff className="w-3 h-3 text-red-400" />
                 )}
@@ -239,10 +257,51 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
             </div>
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center text-white">
-              <Camera className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm opacity-75">Camera Offline</p>
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+            <div className="text-center text-white p-8">
+              <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Camera className="w-8 h-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Camera Feed</h3>
+              
+              {isConnecting ? (
+                <>
+                  <div className="flex items-center justify-center space-x-2 mb-4">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                    <span className="text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Connecting to camera...</span>
+                  </div>
+                </>
+              ) : connectionError ? (
+                <>
+                  <p className="text-sm text-red-400 mb-4">Camera access failed</p>
+                  <p className="text-xs text-slate-500 mb-4">{connectionError}</p>
+                  <button
+                    onClick={startCamera}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm rounded-lg transition-colors"
+                  >
+                    Retry Camera Access
+                  </button>
+                </>
+              ) : !isMonitoring ? (
+                <>
+                  <p className="text-sm text-slate-400 mb-4">Camera not active</p>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-2 h-2 rounded-full bg-slate-600" />
+                    <span className="text-xs text-slate-400">Monitoring disabled</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-4">
+                    Enable live monitoring to start camera feed
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-slate-400 mb-4">Initializing camera...</p>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
+                    <span className="text-xs text-slate-400">Starting up...</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -250,56 +309,56 @@ export default function LiveCameraFeed({ roomId, roomName, isMonitoring, detecti
 
       {/* Detection Status */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-slate-50 rounded-lg p-3">
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
           <div className="flex items-center space-x-2 mb-1">
-            <Users className="w-4 h-4 text-slate-600" />
-            <span className="text-sm font-medium text-slate-900">Last Detection</span>
+            <Users className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Last Detection</span>
           </div>
           {lastDetection ? (
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <Badge
                   variant={lastDetection.occupied ? "default" : "secondary"}
-                  className={lastDetection.occupied ? "bg-green-600" : ""}
+                  className={lastDetection.occupied ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0" : ""}
                 >
                   {lastDetection.occupied ? "Occupied" : "Empty"}
                 </Badge>
-                <span className="text-xs text-slate-600">{Math.round(lastDetection.confidence)}%</span>
+                <span className="text-xs text-slate-600 dark:text-slate-400">{Math.round(lastDetection.confidence)}%</span>
               </div>
-              <p className="text-xs text-slate-500">{new Date(lastDetection.timestamp).toLocaleTimeString()}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-500">{new Date(lastDetection.timestamp).toLocaleTimeString()}</p>
             </div>
           ) : (
-            <p className="text-xs text-slate-500">No detection yet</p>
+            <p className="text-xs text-slate-500 dark:text-slate-500">No detection yet</p>
           )}
         </div>
 
-        <div className="bg-slate-50 rounded-lg p-3">
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
           <div className="flex items-center space-x-2 mb-1">
-            <Zap className="w-4 h-4 text-slate-600" />
-            <span className="text-sm font-medium text-slate-900">Auto Control</span>
+            <Zap className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Auto Control</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${isMonitoring ? "bg-green-400 animate-pulse" : "bg-slate-300"}`} />
-            <span className="text-xs text-slate-600">{isMonitoring ? "Active" : "Inactive"}</span>
+            <div className={`w-2 h-2 rounded-full ${isMonitoring ? "bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" : "bg-slate-300"}`} />
+            <span className="text-xs text-slate-600 dark:text-slate-400">{isMonitoring ? "Active" : "Inactive"}</span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">Interval: {detectionSettings.interval}s</p>
+          <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Interval: {detectionSettings.interval}s</p>
         </div>
       </div>
 
       {/* Detection History */}
       {detectionHistory.length > 0 && (
-        <div className="bg-slate-50 rounded-lg p-3">
-          <h4 className="text-sm font-medium text-slate-900 mb-2">Recent Activity</h4>
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+          <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Recent Activity</h4>
           <div className="space-y-1 max-h-20 overflow-y-auto">
             {detectionHistory
               .slice(-5)
               .reverse()
               .map((detection, index) => (
                 <div key={index} className="flex items-center justify-between text-xs">
-                  <span className={detection.occupied ? "text-green-600" : "text-slate-500"}>
+                  <span className={detection.occupied ? "bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-medium" : "text-slate-500 dark:text-slate-400"}>
                     {detection.occupied ? "Person detected" : "Empty"}
                   </span>
-                  <span className="text-slate-400">{new Date(detection.timestamp).toLocaleTimeString()}</span>
+                  <span className="text-slate-400 dark:text-slate-500">{new Date(detection.timestamp).toLocaleTimeString()}</span>
                 </div>
               ))}
           </div>

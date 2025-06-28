@@ -127,7 +127,7 @@ export default function ManualLightControls({
               </Badge>
             )}
             {isLiveMonitoring && !settings.manualOverride && (
-              <Badge variant="secondary" className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+              <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                 AI Controlled
               </Badge>
             )}
@@ -246,7 +246,7 @@ export default function ManualLightControls({
             <div>
               <span className="text-slate-500 dark:text-slate-400">Power:</span>
               <span
-                className={`ml-2 font-medium ${settings.isOn ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+                className={`ml-2 font-medium ${settings.isOn ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}`}
               >
                 {settings.isOn ? "ON" : "OFF"}
               </span>

@@ -176,7 +176,7 @@ export default function RoomDialog({ open, onOpenChange, room, onSubmit, mode }:
                     </Label>
                     <div
                       className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                        formData.liveMonitoringEnabled ? "bg-green-400 animate-pulse" : "bg-gray-300"
+                        formData.liveMonitoringEnabled ? "bg-blue-400 animate-pulse" : "bg-gray-300"
                       }`}
                     />
                   </div>
@@ -188,7 +188,7 @@ export default function RoomDialog({ open, onOpenChange, room, onSubmit, mode }:
                   id="liveMonitoring"
                   checked={formData.liveMonitoringEnabled}
                   onCheckedChange={(checked) => handleChange("liveMonitoringEnabled", checked)}
-                  className="data-[state=checked]:bg-green-600"
+                  className="data-[state=checked]:bg-blue-600"
                 />
               </div>
 
@@ -221,20 +221,20 @@ export default function RoomDialog({ open, onOpenChange, room, onSubmit, mode }:
                 <div
                   className={`p-3 rounded-lg border-2 transition-all duration-300 ${
                     formData.liveMonitoringEnabled
-                      ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
+                      ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"
                       : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50"
                   }`}
                 >
                   <div className="flex items-center space-x-2 mb-2">
                     <Eye
                       className={`w-4 h-4 ${
-                        formData.liveMonitoringEnabled ? "text-green-600 dark:text-green-400" : "text-gray-400"
+                        formData.liveMonitoringEnabled ? "text-blue-600 dark:text-blue-400" : "text-gray-400"
                       }`}
                     />
                     <span
                       className={`text-sm font-medium ${
                         formData.liveMonitoringEnabled
-                          ? "text-green-800 dark:text-green-200"
+                          ? "text-blue-800 dark:text-blue-200"
                           : "text-gray-600 dark:text-gray-400"
                       }`}
                     >
@@ -244,7 +244,7 @@ export default function RoomDialog({ open, onOpenChange, room, onSubmit, mode }:
                   <ul
                     className={`text-xs space-y-1 ${
                       formData.liveMonitoringEnabled
-                        ? "text-green-700 dark:text-green-300"
+                        ? "text-blue-700 dark:text-blue-300"
                         : "text-gray-500 dark:text-gray-400"
                     }`}
                   >

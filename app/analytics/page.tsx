@@ -62,10 +62,10 @@ export default function AnalyticsPage() {
           <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Accuracy Rate</CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{analyticsData.accuracyRate}%</div>
+              <div className="text-2xl font-bold text-blue-600">{analyticsData.accuracyRate}%</div>
               <p className="text-xs text-slate-600">+2.1% improvement</p>
             </CardContent>
           </Card>
@@ -214,9 +214,9 @@ export default function AnalyticsPage() {
                       Consider reducing interval to 2s during peak hours for better responsiveness
                     </div>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div className="font-medium text-green-900 text-sm">Energy Efficiency</div>
-                    <div className="text-green-700 text-xs mt-1">
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="font-medium text-blue-900 text-sm">Energy Efficiency</div>
+                    <div className="text-blue-700 text-xs mt-1">
                       Current settings are saving 23.5% energy compared to manual control
                     </div>
                   </div>

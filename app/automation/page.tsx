@@ -122,7 +122,7 @@ export default function AutomationPage() {
 
           <Card className="glass-card">
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">{activeRules}</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">{activeRules}</div>
               <div className="text-sm dark-text-secondary">Active Rules</div>
             </CardContent>
           </Card>
@@ -184,7 +184,7 @@ export default function AutomationPage() {
                       <div className="font-medium dark-text-primary">Detection Accuracy</div>
                       <div className="text-sm dark-text-secondary">Average confidence score</div>
                     </div>
-                    <Badge className="bg-green-100 text-green-800">87%</Badge>
+                    <Badge className="bg-blue-100 text-blue-800">87%</Badge>
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">

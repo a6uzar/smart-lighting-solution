@@ -59,14 +59,14 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${isMonitoring ? "bg-green-400 animate-pulse" : "bg-slate-300"}`}
+                    className={`w-3 h-3 rounded-full ${isMonitoring ? "bg-blue-400 animate-pulse" : "bg-slate-300"}`}
                   />
                   <span className="font-medium text-slate-900">
                     Live Monitoring: {isMonitoring ? "Active" : "Inactive"}
                   </span>
                 </div>
 
-                <Badge variant={isMonitoring ? "default" : "secondary"} className={isMonitoring ? "bg-green-600" : ""}>
+                <Badge variant={isMonitoring ? "default" : "secondary"} className={isMonitoring ? "bg-blue-600" : ""}>
                   {aiControlledRooms} AI Rooms Active
                 </Badge>
               </div>
@@ -101,10 +101,10 @@ export default function DashboardPage() {
           <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium dark-text-secondary">Occupied Rooms</CardTitle>
-              <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{occupiedRooms}</div>
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{occupiedRooms}</div>
               <p className="text-xs dark-text-secondary">
                 {totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0}% occupancy rate
               </p>

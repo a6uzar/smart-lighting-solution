@@ -23,6 +23,7 @@ export default function LiveCamButton({
   children,
 }: LiveCamButtonProps) {
   const [isActive, setIsActive] = useState(false)
+  const [isTestingCamera, setIsTestingCamera] = useState(false)
 
   const handleToggle = async () => {
     if (liveMonitoringEnabled) {
@@ -35,41 +36,75 @@ export default function LiveCamButton({
       setIsActive(!isActive)
 
       if (!isActive) {
-        // Simulate camera activation
-        toast.success("Camera test activated")
+        // Test camera access
+        setIsTestingCamera(true)
+        toast.info("Testing camera access...")
 
-        // Simulate a detection result after 2 seconds
-        setTimeout(() => {
-          const isOccupied = Math.random() > 0.5
-          const confidence = Math.random() * 0.4 + 0.6
-          onDetectionResult(isOccupied, confidence)
-          toast.success(
-            `Test detection: ${isOccupied ? "Occupied" : "Empty"} (${Math.round(confidence * 100)}% confidence)`,
-          )
-          setIsActive(false)
-        }, 2000)
+        try {
+          // Try to access camera
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { width: 640, height: 480 } 
+          })
+          
+          // Camera access successful
+          toast.success("Camera access successful!")
+          
+          // Stop the test stream immediately
+          stream.getTracks().forEach(track => track.stop())
+          
+          // Simulate a detection result after 2 seconds
+          setTimeout(() => {
+            const isOccupied = Math.random() > 0.5
+            const confidence = Math.random() * 0.4 + 0.6
+            onDetectionResult(isOccupied, confidence)
+            toast.success(
+              `Test detection: ${isOccupied ? "Occupied" : "Empty"} (${Math.round(confidence * 100)}% confidence)`,
+            )
+            setIsActive(false)
+            setIsTestingCamera(false)
+          }, 2000)
+        } catch (cameraError) {
+          console.error("Camera access error:", cameraError)
+          toast.error("Camera access denied or not available. Using simulated detection.")
+          
+          // Fallback to simulated detection
+          setTimeout(() => {
+            const isOccupied = Math.random() > 0.5
+            const confidence = Math.random() * 0.4 + 0.6
+            onDetectionResult(isOccupied, confidence)
+            toast.success(
+              `Simulated detection: ${isOccupied ? "Occupied" : "Empty"} (${Math.round(confidence * 100)}% confidence)`,
+            )
+            setIsActive(false)
+            setIsTestingCamera(false)
+          }, 1000)
+        }
       } else {
         toast.info("Camera test stopped")
+        setIsTestingCamera(false)
       }
     } catch (error) {
       console.error("Camera error:", error)
       toast.error("Failed to access camera")
       setIsActive(false)
+      setIsTestingCamera(false)
     }
   }
 
   return (
-    <Button onClick={handleToggle} className={className} variant="outline">
+    <Button onClick={handleToggle} className={className} variant="outline" disabled={isTestingCamera}>
       {children || (
         <>
           {liveMonitoringEnabled ? (
-            <Video className="w-4 h-4 mr-2 text-green-500" />
-          ) : isActive ? (
+            <Video className="w-4 h-4 mr-2 text-purple-600" />
+          ) : isActive || isTestingCamera ? (
             <VideoOff className="w-4 h-4 mr-2" />
           ) : (
             <Camera className="w-4 h-4 mr-2" />
           )}
-          {liveMonitoringEnabled ? "Live Active" : isActive ? "Stop Test" : "Test Camera"}
+          {liveMonitoringEnabled ? "Live Active" : 
+           isTestingCamera ? "Testing..." :
+           isActive ? "Stop Test" : "Test Camera"}
         </>
       )}
     </Button>

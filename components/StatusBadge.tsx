@@ -14,7 +14,7 @@ export default function StatusBadge({ status, type }: StatusBadgeProps) {
         ? {
             label: "Occupied",
             className:
-              "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700",
+              "bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 border-purple-200 dark:border-purple-700",
           }
         : {
             label: "Empty",

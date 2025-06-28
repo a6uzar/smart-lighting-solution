@@ -114,8 +114,8 @@ export default function LiveCameraDisplay({
               {lastDetection && (
                 <div className="absolute inset-4">
                   {lastDetection.occupancy && (
-                    <div className="border-2 border-green-400 rounded-lg w-20 h-16 absolute top-4 left-4 animate-pulse">
-                      <div className="absolute -top-6 left-0 bg-green-400 text-black text-xs px-2 py-1 rounded">
+                    <div className="border-2 border-gradient-to-r from-blue-400 to-purple-400 rounded-lg w-20 h-16 absolute top-4 left-4 animate-pulse" style={{borderImageSource: "linear-gradient(to right, #60A5FA, #A78BFA)", borderImageSlice: 1}}>
+                      <div className="absolute -top-6 left-0 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded">
                         Person {Math.round(lastDetection.confidence * 100)}%
                       </div>
                     </div>
@@ -125,11 +125,11 @@ export default function LiveCameraDisplay({
 
               {/* Status indicators */}
               <div className="absolute top-2 left-2 flex items-center space-x-2">
-                <Badge variant="secondary" className="bg-green-500/90 text-white border-0">
+                <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
                   <Wifi className="w-3 h-3 mr-1" />
                   Live
                 </Badge>
-                <Badge variant="secondary" className="bg-blue-500/90 text-white border-0">
+                <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
                   <Camera className="w-3 h-3 mr-1" />
                   AI Active
                 </Badge>
@@ -140,7 +140,7 @@ export default function LiveCameraDisplay({
                 <Badge
                   variant="secondary"
                   className={`${
-                    lastDetection?.occupancy ? "bg-green-500/90 text-white" : "bg-slate-500/90 text-white"
+                    lastDetection?.occupancy ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white" : "bg-slate-500/90 text-white"
                   } border-0`}
                 >
                   {lastDetection?.occupancy ? "Occupied" : "Empty"}
@@ -162,7 +162,7 @@ export default function LiveCameraDisplay({
           <div className="p-3 bg-slate-50 dark:bg-slate-800 border-t">
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${lastDetection.occupancy ? "bg-green-400" : "bg-slate-400"}`} />
+                <div className={`w-2 h-2 rounded-full ${lastDetection.occupancy ? "bg-gradient-to-r from-blue-400 to-purple-400" : "bg-slate-400"}`} />
                 <span className="text-slate-600 dark:text-slate-400">
                   Last detection: {lastDetection.timestamp.toLocaleTimeString()}
                 </span>

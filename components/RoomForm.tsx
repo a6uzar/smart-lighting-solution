@@ -101,7 +101,7 @@ export default function RoomForm({ room, onSubmit, onCancel }: RoomFormProps) {
                   Live Monitoring
                 </Label>
                 <div
-                  className={`w-2 h-2 rounded-full ${formData.liveMonitoringEnabled ? "bg-green-400 animate-pulse" : "bg-gray-300"}`}
+                  className={`w-2 h-2 rounded-full ${formData.liveMonitoringEnabled ? "bg-blue-400 animate-pulse" : "bg-gray-300"}`}
                 />
               </div>
               <p className="text-sm text-slate-600">Enable real-time AI analysis and automatic light control</p>
@@ -156,16 +156,16 @@ export default function RoomForm({ room, onSubmit, onCancel }: RoomFormProps) {
           {/* Feature Comparison */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div
-              className={`p-3 rounded-lg border-2 transition-all ${formData.liveMonitoringEnabled ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"}`}
+              className={`p-3 rounded-lg border-2 transition-all ${formData.liveMonitoringEnabled ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-gray-50"}`}
             >
               <div className="flex items-center space-x-2 mb-2">
-                <Camera className={`w-4 h-4 ${formData.liveMonitoringEnabled ? "text-green-600" : "text-gray-400"}`} />
-                <span className={`font-medium ${formData.liveMonitoringEnabled ? "text-green-800" : "text-gray-600"}`}>
+                <Camera className={`w-4 h-4 ${formData.liveMonitoringEnabled ? "text-blue-600" : "text-gray-400"}`} />
+                <span className={`font-medium ${formData.liveMonitoringEnabled ? "text-blue-800" : "text-gray-600"}`}>
                   Live Monitoring
                 </span>
               </div>
               <ul
-                className={`text-xs space-y-1 ${formData.liveMonitoringEnabled ? "text-green-700" : "text-gray-500"}`}
+                className={`text-xs space-y-1 ${formData.liveMonitoringEnabled ? "text-blue-700" : "text-gray-500"}`}
               >
                 <li>• Real-time AI analysis</li>
                 <li>• Automatic light control</li>
